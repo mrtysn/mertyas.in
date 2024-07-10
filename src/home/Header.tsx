@@ -1,11 +1,15 @@
 import { Link } from "wouter";
 import { FULL_NAME } from "../utils/constants";
+import ThemeSelector from "../utils/ThemeSelector";
 
 function Header() {
   return (
     <nav>
       <ul>
         <li>{FULL_NAME}</li>
+        <li className="float-right sticky">
+          <ThemeSelector />
+        </li>
         <li>
           <Link href="/">Home</Link>
         </li>

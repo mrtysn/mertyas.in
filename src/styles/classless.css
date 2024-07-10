@@ -37,6 +37,17 @@ html[data-theme="dark"] {
   --cemphbg: #0b91;
 }
 
+html[data-theme="light"] {
+  --cfg: #433;
+  --cbg: #fff;
+  --cdark: #888;
+  --clight: #f5f6f7;
+  --cmed: #d1d1d1;
+  --clink: #07c;
+  --cemph: #9b4dca;
+  --cemphbg: #9b4dca10;
+}
+
 /* 2. Reset –––––––––––––––––––––––––––––––––––––––––––– */
 
 /* reset block elements  */
