@@ -1,10 +1,11 @@
 import { Route } from "wouter";
-import Blog from "./blog/Blog";
-import Post from "./blog/Post";
-import Home from "./home/Home";
+import "./styles/custom.css";
 import Header from "./home/Header";
 import Footer from "./home/Footer";
-import "./styles/custom.css";
+import Home from "./home/Home";
+import Blog from "./blog/Blog";
+import Post from "./blog/Post";
+import About from "./home/About";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/" component={Home} />
         <Route path="/blog" component={Blog} />
         <Route path="/blog/*" component={Post} />
+        <Route path="/about" component={About} />
       </div>
       <Footer />
     </main>
