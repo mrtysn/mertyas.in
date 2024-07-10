@@ -11,7 +11,7 @@ function App() {
   return (
     <main>
       <Header />
-      <div className="minHeight">
+      <div className="content">
         <Route path="/" component={Home} />
         <Route path="/blog" component={Blog} />
         <Route path="/blog/*" component={Post} />
