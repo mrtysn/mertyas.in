@@ -5,6 +5,7 @@ import githubIcon from "../assets/icons/github.svg";
 import linkedinIcon from "../assets/icons/linkedin.svg";
 import twitterIcon from "../assets/icons/twitter.svg";
 import fileTextIcon from "../assets/icons/file-text.svg";
+import instagramIcon from "../assets/icons/instagram.svg";
 
 const snapshotDate = new Date("2024-07-12");
 const snapshotExperience = 10;
@@ -59,6 +60,31 @@ const AboutAuthor = ({ experience }: { experience: number | null }) => (
     </p>
   </>
 );
+const AuthorLink = ({
+  icon,
+  text,
+  link,
+  linkText,
+}: {
+  icon: string | null;
+  text: string | null;
+  link: string | null;
+  linkText: string | null;
+}) => {
+  if (!text || !link || !linkText) return null; // Handle null cases
+
+  return (
+    <tr>
+      <td>
+        <img src={icon ?? ""} width={25} height={25} alt={text} />
+      </td>
+      <td className="text-left">{text}</td>
+      <td>
+        <Outlink text={linkText} link={link} />
+      </td>
+    </tr>
+  );
+};
 
 const AuthorLinks = () => (
   <>
@@ -66,57 +92,42 @@ const AuthorLinks = () => (
     <table>
       {/* <thead></thead> */}
       <tbody>
-        <tr>
-          <td>
-            <img src={fileTextIcon} width={25} height={25} alt="cv" />
-          </td>
-          <td className="text-left">cv</td>
-          <td>
-            <Outlink
-              text="mrtysn.github.io/cv"
-              link="https://mrtysn.github.io/cv"
-            />
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <img src={githubIcon} width={25} height={25} alt="github" />
-          </td>
-          <td className="text-left">github</td>
-          <td>
-            <Outlink text="mrtysn" link="https://github.com/mrtysn" />
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <img src={twitterIcon} width={25} height={25} alt="twitter" />
-          </td>
-          <td className="text-left">twitter</td>
-          <td>
-            <Outlink text="mertyas_in" link="https://twitter.com/mertyas_in" />
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <img src={linkedinIcon} width={25} height={25} alt="linkedin" />
-          </td>
-          <td className="text-left">linkedin</td>
-          <td>
-            <Outlink
-              text="mert-yasin"
-              link="https://linkedin.com/in/mert-yasin/"
-            />
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <img src={githubIcon} width={25} height={25} alt="github" />
-          </td>
-          <td className="text-left">github</td>
-          <td>
-            <Outlink text="mert-cypher" link="https://github.com/mert-cypher" />
-          </td>
-        </tr>
+        <AuthorLink
+          icon={fileTextIcon}
+          text="cv"
+          link="https://mrtysn.github.io/cv"
+          linkText="mrtysn.github.io/cv"
+        />
+        <AuthorLink
+          icon={githubIcon}
+          text="github"
+          link="https://github.com/mrtysn"
+          linkText="mrtysn"
+        />
+        <AuthorLink
+          icon={linkedinIcon}
+          text="linkedin"
+          link="https://linkedin.com/in/mert-yasin/"
+          linkText="mert-yasin"
+        />
+        <AuthorLink
+          icon={twitterIcon}
+          text="twitter"
+          link="https://twitter.com/mertyas_in"
+          linkText="mertyas_in"
+        />
+        <AuthorLink
+          icon={githubIcon}
+          text="github"
+          link="https://github.com/mert-cypher"
+          linkText="mert-cypher"
+        />
+        <AuthorLink
+          icon={instagramIcon}
+          text="instagram"
+          link="https://www.instagram.com/mertyas.in/"
+          linkText="mertyas.in"
+        />
       </tbody>
     </table>
   </>
