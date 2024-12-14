@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# https://github.com/yamadashy/repomix
+repomix-output.txt

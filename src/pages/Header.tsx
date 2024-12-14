@@ -1,6 +1,6 @@
 import { Link } from "wouter";
-import { FULL_NAME } from "../utils/constants";
 import ThemeSelector from "../utils/ThemeSelector";
+import { FULL_NAME } from "../utils/Constants";
 
 function Header() {
   return (
@@ -11,16 +11,13 @@ function Header() {
           <ThemeSelector />
         </li>
         <li>
-          <Link href="/">Home</Link>
+          <Link href="/">About</Link>
         </li>
         <li>
           <Link href="/blog">Blog</Link>
         </li>
         <li>
           <Link href="/projects">Projects</Link>
-        </li>
-        <li>
-          <Link href="/about">About</Link>
         </li>
       </ul>
     </nav>

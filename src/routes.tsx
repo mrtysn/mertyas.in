@@ -1,8 +1,7 @@
 import { ComponentType } from "react";
-import Home from "./home/Home";
 import Blog from "./blog/Blog";
 import Post from "./blog/Post";
-import About from "./home/About";
+import About from "./pages/About";
 import Projects from "./projects/Projects";
 import { RouteComponentProps } from "wouter";
 
@@ -14,7 +13,7 @@ export type RouteProps = {
 export const routes: RouteProps[] = [
   {
     path: "/",
-    component: Home,
+    component: About,
   },
   {
     path: "/blog",
@@ -23,10 +22,6 @@ export const routes: RouteProps[] = [
   {
     path: "/blog/*",
     component: Post,
-  },
-  {
-    path: "/about",
-    component: About,
   },
   {
     path: "/projects",
