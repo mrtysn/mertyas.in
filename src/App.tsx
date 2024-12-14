@@ -1,7 +1,7 @@
 import { Route } from "wouter";
 import "./styles/custom.css";
-import Header from "./pages/Header";
-import Footer from "./pages/Footer";
+import Header from "./home/Header";
+import Footer from "./home/Footer";
 import { routes } from "./routes";
 
 function App() {

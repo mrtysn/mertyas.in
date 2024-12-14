@@ -1,6 +1,10 @@
 import { useState } from "react";
 import Outlink from "../utils/Outlink";
 import { useEffect } from "react";
+import githubIcon from "../assets/icons/github.svg";
+import linkedinIcon from "../assets/icons/linkedin.svg";
+import twitterIcon from "../assets/icons/twitter.svg";
+import fileTextIcon from "../assets/icons/file-text.svg";
 
 const snapshotDate = new Date("2024-07-12");
 const snapshotExperience = 10;
@@ -60,9 +64,13 @@ const AuthorLinks = () => (
   <>
     <h2>Links</h2>
     <table>
+      {/* <thead></thead> */}
       <tbody>
         <tr>
-          <td className="text-right">cv</td>
+          <td>
+            <img src={fileTextIcon} width={25} height={25} alt="cv" />
+          </td>
+          <td className="text-left">cv</td>
           <td>
             <Outlink
               text="mrtysn.github.io/cv"
@@ -71,30 +79,42 @@ const AuthorLinks = () => (
           </td>
         </tr>
         <tr>
-          <td className="text-right">github</td>
+          <td>
+            <img src={githubIcon} width={25} height={25} alt="github" />
+          </td>
+          <td className="text-left">github</td>
           <td>
             <Outlink text="mrtysn" link="https://github.com/mrtysn" />
           </td>
         </tr>
         <tr>
-          <td className="text-right">github</td>
           <td>
-            <Outlink text="mert-cypher" link="https://github.com/mert-cypher" />
+            <img src={twitterIcon} width={25} height={25} alt="twitter" />
           </td>
-        </tr>
-        <tr>
-          <td className="text-right">twitter</td>
+          <td className="text-left">twitter</td>
           <td>
             <Outlink text="mertyas_in" link="https://twitter.com/mertyas_in" />
           </td>
         </tr>
         <tr>
-          <td className="text-right">linkedin</td>
+          <td>
+            <img src={linkedinIcon} width={25} height={25} alt="linkedin" />
+          </td>
+          <td className="text-left">linkedin</td>
           <td>
             <Outlink
               text="mert-yasin"
               link="https://linkedin.com/in/mert-yasin/"
             />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <img src={githubIcon} width={25} height={25} alt="github" />
+          </td>
+          <td className="text-left">github</td>
+          <td>
+            <Outlink text="mert-cypher" link="https://github.com/mert-cypher" />
           </td>
         </tr>
       </tbody>

@@ -1,7 +1,7 @@
 import { ComponentType } from "react";
 import Blog from "./blog/Blog";
 import Post from "./blog/Post";
-import About from "./pages/About";
+import About from "./home/About";
 import Projects from "./projects/Projects";
 import { RouteComponentProps } from "wouter";
 
