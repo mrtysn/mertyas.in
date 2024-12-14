@@ -7,7 +7,7 @@ function Header() {
     <nav>
       <ul>
         <li>{FULL_NAME}</li>
-        <li className="float-right sticky">
+        <li className="float-right sticky no-select">
           <ThemeSelector />
         </li>
         <li>
