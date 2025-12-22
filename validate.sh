@@ -34,7 +34,7 @@ echo "🎯 Validating mertyas.in"
 echo ""
 
 run_step "Install" "pnpm install --silent"
-run_step "Lint" "ESLINT_USE_FLAT_CONFIG=false pnpm exec eslint . --ext ts,tsx"
+run_step "Lint" "pnpm exec eslint ."
 run_step "Type check" "pnpm exec tsc --noEmit"
 run_step "Build" "pnpm build"
 
