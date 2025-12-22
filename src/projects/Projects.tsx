@@ -4,9 +4,9 @@ const Project = ({
   link,
   year,
 }: {
-  text: string | null;
-  link: string | null;
-  year: string | null;
+  text: string;
+  link: string;
+  year: string;
 }) => {
   return (
     <tr>

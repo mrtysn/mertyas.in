@@ -1,6 +1,4 @@
-import { useState } from "react";
 import Outlink from "../utils/Outlink";
-import { useEffect } from "react";
 import githubIcon from "../assets/icons/github.svg";
 import linkedinIcon from "../assets/icons/linkedin.svg";
 import twitterIcon from "../assets/icons/twitter.svg";
@@ -36,12 +34,12 @@ const AboutWebsite = () => (
   </>
 );
 
-const AboutAuthor = ({ experience }: { experience: number | null }) => (
+const AboutAuthor = ({ experience }: { experience: number }) => (
   <>
     <h2 className="mb-1">About</h2>
     <p>
       Mert is a <span className="text-primary">Senior Software Engineer</span>{" "}
-      with {experience ? experience + snapshotExperience : snapshotExperience}+
+      with {experience + snapshotExperience}+
       years of experience and PhD studies in{" "}
       <span className="text-primary">data science</span> and{" "}
       <span className="text-primary">machine learning</span>. He has experience
@@ -66,17 +64,15 @@ const AuthorLink = ({
   link,
   linkText,
 }: {
-  icon: string | null;
-  text: string | null;
-  link: string | null;
-  linkText: string | null;
+  icon: string;
+  text: string;
+  link: string;
+  linkText: string;
 }) => {
-  if (!text || !link || !linkText) return null; // Handle null cases
-
   return (
     <tr>
       <td>
-        <img src={icon ?? ""} width={25} height={25} alt={text} />
+        <img src={icon} width={25} height={25} alt={text} />
       </td>
       <td className="text-left">{text}</td>
       <td>
@@ -134,11 +130,7 @@ const AuthorLinks = () => (
 );
 
 function About() {
-  const [experience, setExperience] = useState<number | null>(null);
-
-  useEffect(() => {
-    setExperience(calculateExperience());
-  }, []);
+  const experience = calculateExperience();
 
   return (
     <div>

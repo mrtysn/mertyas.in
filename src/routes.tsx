@@ -3,6 +3,7 @@ import Blog from "./blog/Blog";
 import Post from "./blog/Post";
 import About from "./home/About";
 import Projects from "./projects/Projects";
+import NotFound from "./NotFound";
 import { RouteComponentProps } from "wouter";
 
 export type RouteProps = {
@@ -26,5 +27,9 @@ export const routes: RouteProps[] = [
   {
     path: "/projects",
     component: Projects,
+  },
+  {
+    path: "/:rest*",
+    component: NotFound,
   },
 ];

@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import ThemeSelector from "../utils/ThemeSelector";
-import { FULL_NAME } from "../utils/Constants";
+import { FULL_NAME } from "../utils/constants";
 
 function Header() {
   return (
