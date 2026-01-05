@@ -1,6 +1,6 @@
 export interface PostFrontmatter {
   title: string;
-  date: string;
+  date?: string;
   description: string;
   tags: string[];
   draft?: boolean;

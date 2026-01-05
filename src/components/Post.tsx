@@ -26,9 +26,11 @@ function Post() {
     <article>
       <header>
         <h1>{post.frontmatter.title}</h1>
-        <p>
-          <small>{post.frontmatter.date}</small>
-        </p>
+        {post.frontmatter.date && (
+          <p>
+            <small>{post.frontmatter.date}</small>
+          </p>
+        )}
       </header>
       <div dangerouslySetInnerHTML={{ __html: post.html }} />
       {post.frontmatter.tags.length > 0 && (

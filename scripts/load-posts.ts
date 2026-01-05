@@ -18,26 +18,31 @@ export function loadPosts(includeDrafts = false, limit?: number): Post[] {
   // Read all .md files from posts directory
   const files = fs.readdirSync(postsDir).filter((file) => file.endsWith('.md'));
 
-  const posts: Post[] = files.map((filename) => {
-    const filepath = path.join(postsDir, filename);
-    const content = fs.readFileSync(filepath, 'utf-8');
+  const posts: Post[] = files
+    .filter((filename) => {
+      // Only include files with date prefix (YYYY-MM-DD-) for feeds
+      return /^\d{4}-\d{2}-\d{2}-/.test(filename);
+    })
+    .map((filename) => {
+      const filepath = path.join(postsDir, filename);
+      const content = fs.readFileSync(filepath, 'utf-8');
 
-    // Extract slug from filename (remove date prefix and .md extension)
-    const slug = filename.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/\.md$/, '');
+      // Extract slug from filename (remove date prefix and .md extension)
+      const slug = filename.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/\.md$/, '');
 
-    // Parse frontmatter and content
-    const { frontmatter, content: markdownContent } = parseFrontmatter(content);
+      // Parse frontmatter and content
+      const { frontmatter, content: markdownContent } = parseFrontmatter(content);
 
-    // Render markdown to HTML
-    const html = md.render(markdownContent);
+      // Render markdown to HTML
+      const html = md.render(markdownContent);
 
-    return {
-      slug,
-      frontmatter,
-      content: markdownContent,
-      html,
-    };
-  });
+      return {
+        slug,
+        frontmatter,
+        content: markdownContent,
+        html,
+      };
+    });
 
   // Filter drafts if not including them
   const filteredPosts = includeDrafts

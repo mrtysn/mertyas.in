@@ -18,7 +18,8 @@ function Posts() {
               </Link>
               <br />
               <small>
-                {post.frontmatter.date} - {post.frontmatter.description}
+                {post.frontmatter.date ? `${post.frontmatter.date} - ` : ''}
+                {post.frontmatter.description}
               </small>
               {post.frontmatter.tags.length > 0 && (
                 <>
