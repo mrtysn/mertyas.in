@@ -12,3 +12,18 @@
   -ms-user-select: none;
   user-select: none;
 }
+
+/* Markdown content styles */
+article img {
+  max-width: 100%;
+  height: auto;
+}
+
+article pre {
+  overflow-x: auto;
+}
+
+article code {
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+}

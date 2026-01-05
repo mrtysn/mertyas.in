@@ -1,9 +1,10 @@
 import { ComponentType } from "react";
-import Blog from "./blog/Blog";
-import Post from "./blog/Post";
+import Posts from "./components/Posts";
+import Post from "./components/Post";
+import Tags from "./components/Tags";
+import Tag from "./components/Tag";
 import About from "./home/About";
 import Projects from "./projects/Projects";
-import NotFound from "./NotFound";
 import { RouteComponentProps } from "wouter";
 
 export type RouteProps = {
@@ -17,19 +18,23 @@ export const routes: RouteProps[] = [
     component: About,
   },
   {
-    path: "/blog",
-    component: Blog,
-  },
-  {
-    path: "/blog/*",
-    component: Post,
-  },
-  {
     path: "/projects",
     component: Projects,
   },
   {
-    path: "/:rest*",
-    component: NotFound,
+    path: "/posts",
+    component: Posts,
+  },
+  {
+    path: "/tags",
+    component: Tags,
+  },
+  {
+    path: "/tags/:tag",
+    component: Tag,
+  },
+  {
+    path: "/:slug",
+    component: Post,
   },
 ];
