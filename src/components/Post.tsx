@@ -1,5 +1,7 @@
 import { useRoute, Link } from "wouter";
+import { useEffect } from "react";
 import { getPostBySlug } from "../utils/posts";
+import { updateMetaTags } from "../utils/meta";
 
 function Post() {
   const [, params] = useRoute("/:slug");
@@ -10,6 +12,19 @@ function Post() {
   }
 
   const post = getPostBySlug(slug);
+
+  useEffect(() => {
+    if (post) {
+      updateMetaTags({
+        title: post.frontmatter.title,
+        description: post.frontmatter.description,
+        url: `https://mertyas.in/${post.slug}`,
+        type: 'article',
+        date: post.frontmatter.date,
+        image: post.frontmatter.image,
+      });
+    }
+  }, [post]);
 
   if (!post) {
     return (

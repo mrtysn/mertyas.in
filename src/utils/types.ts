@@ -4,6 +4,7 @@ export interface PostFrontmatter {
   description: string;
   tags: string[];
   draft?: boolean;
+  image?: string;
 }
 
 export interface Post {
