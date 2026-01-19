@@ -25,3 +25,6 @@ dist-ssr
 
 # https://github.com/yamadashy/repomix
 repomix-output.txt
+
+# claude - share skills/rules/commands, but not personal settings
+.claude/settings.local.json
