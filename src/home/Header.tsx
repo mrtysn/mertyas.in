@@ -19,6 +19,9 @@ function Header() {
         <li>
           <Link href="/projects">Projects</Link>
         </li>
+        <li>
+          <Link href="/bookmarks">Bookmarks</Link>
+        </li>
       </ul>
     </nav>
   );

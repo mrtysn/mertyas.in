@@ -1,0 +1,209 @@
+/* Bookmarks breadcrumb navigation */
+.bookmarks-breadcrumb {
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+
+.bookmarks-breadcrumb a {
+  cursor: pointer;
+  color: var(--link-color, #0066cc);
+  text-decoration: none;
+}
+
+.bookmarks-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+/* Toolbar */
+.bookmarks-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.bookmarks-search {
+  flex: 1;
+  max-width: 400px;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 4px;
+}
+
+.bookmarks-count {
+  color: var(--text-muted, #666);
+}
+
+/* Grid layout */
+.bookmarks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Bookmark card */
+.bookmark-card {
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.bookmark-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.bookmark-card a {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-decoration: none;
+  color: inherit;
+  width: 100%;
+}
+
+/* Favicon display */
+.bookmark-favicon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary, #f5f5f5);
+  border-radius: 4px;
+}
+
+.bookmark-favicon img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.bookmark-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-muted, #666);
+}
+
+/* Bookmark info */
+.bookmark-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.bookmark-info h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bookmark-url {
+  color: var(--text-muted, #666);
+  font-size: 0.85rem;
+}
+
+/* Status badges */
+.status {
+  font-size: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+  margin-left: 0.5rem;
+  display: inline-block;
+}
+
+.status-success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-redirect {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-client-error {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-server-error {
+  background: #f5c6cb;
+  color: #721c24;
+}
+
+.status-unknown {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+/* Tags */
+.bookmark-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.tag {
+  font-size: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  background: var(--bg-secondary, #f5f5f5);
+  border-radius: 4px;
+  color: var(--text-muted, #666);
+}
+
+/* Folder card */
+.folder-card {
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-secondary, #f5f5f5);
+}
+
+.folder-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.folder-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.folder-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.folder-info h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.folder-info small {
+  color: var(--text-muted, #666);
+}

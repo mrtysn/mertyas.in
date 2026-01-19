@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && tsx scripts/generate-feeds.ts",
+    "build": "tsc -b && vite build && tsx scripts/generate-feeds.ts && tsx scripts/bookmarks/build-bookmarks.ts",
     "lint": "eslint .",
     "preview": "vite preview",
-    "validate": "./validate.sh"
+    "validate": "./validate.sh",
+    "import:bookmarks": "tsx scripts/bookmarks/build-bookmarks.ts --input"
   },
   "dependencies": {
     "highlight.js": "^11.11.1",
