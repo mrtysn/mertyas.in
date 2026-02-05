@@ -9,7 +9,13 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "validate": "./validate.sh",
-    "import:bookmarks": "tsx scripts/bookmarks/build-bookmarks.ts --input"
+    "import:bookmarks": "tsx scripts/bookmarks/build-bookmarks.ts --input",
+    "bookmarks:organize": "tsx scripts/bookmarks/llm-organize.ts",
+    "bookmarks:apply": "tsx scripts/bookmarks/apply-suggestions.ts",
+    "bookmarks:wayback": "tsx scripts/bookmarks/check-wayback.ts",
+    "bookmarks:export": "tsx scripts/bookmarks/export-firefox-json.ts",
+    "bookmarks:diff": "tsx scripts/bookmarks/sync-diff.ts",
+    "bookmarks:migrate": "tsx scripts/bookmarks/migrate-v2.ts"
   },
   "dependencies": {
     "highlight.js": "^11.11.1",
@@ -19,6 +25,7 @@
     "wouter": "^3.9.0"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
     "@eslint/js": "^9.39.2",
     "@types/markdown-it": "^14.1.2",
     "@types/react": "^19.2.7",

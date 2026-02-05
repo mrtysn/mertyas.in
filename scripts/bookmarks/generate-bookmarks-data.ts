@@ -11,14 +11,15 @@ const __dirname = path.dirname(__filename);
 const DATA_PATH = path.join(__dirname, '../../src/bookmarks/data/bookmarks.json');
 
 /**
- * Generate bookmarks.json from parsed Firefox HTML tree
+ * Generate BookmarksData from parsed Firefox tree.
+ * Returns the data object — caller decides whether to write or merge.
  */
-export function generateBookmarksData(parsedTree: ParsedNode): void {
+export function generateBookmarksData(parsedTree: ParsedNode): BookmarksData {
   const flatBookmarks: Bookmark[] = [];
   const root: BookmarkFolder = convertToFolder(parsedTree, [], flatBookmarks);
 
   const data: BookmarksData = {
-    version: '1.0.0',
+    version: '2.0.0',
     importDate: Date.now(),
     root,
     flatBookmarks,
@@ -30,15 +31,19 @@ export function generateBookmarksData(parsedTree: ParsedNode): void {
     },
   };
 
-  // Ensure directory exists
+  return data;
+}
+
+/**
+ * Write BookmarksData to disk.
+ */
+export function writeBookmarksData(data: BookmarksData): void {
   const dataDir = path.dirname(DATA_PATH);
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
   }
-
-  // Write to file
   fs.writeFileSync(DATA_PATH, JSON.stringify(data, null, 2), 'utf-8');
-  console.log(`✓ Generated bookmarks data: ${flatBookmarks.length} bookmarks`);
+  console.log(`  Generated bookmarks data: ${data.flatBookmarks.length} bookmarks`);
 }
 
 /**
@@ -56,6 +61,7 @@ function convertToFolder(
     path: currentPath,
     bookmarks: [],
     subfolders: [],
+    firefoxGuid: node.firefoxGuid,
   };
 
   if (!node.children) {
@@ -92,6 +98,8 @@ function convertToBookmark(node: ParsedNode, folderPath: string[]): Bookmark {
     icon: node.icon,
     tags: generateTags(folderPath),
     folderPath,
+    firefoxGuid: node.firefoxGuid,
+    source: 'firefox',
   };
 }
 

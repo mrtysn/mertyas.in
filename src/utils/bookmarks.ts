@@ -13,7 +13,7 @@ export function getAllBookmarks(): BookmarksData {
 
   if (entries.length === 0) {
     return {
-      version: '1.0.0',
+      version: '2.0.0',
       importDate: 0,
       root: {
         id: 'root',

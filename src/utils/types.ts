@@ -26,6 +26,11 @@ export interface Bookmark {
   lastChecked?: number;
   statusCode?: number;
   checkError?: string;
+  firefoxGuid?: string;
+  source: 'firefox' | 'manual';
+  locallyModified?: boolean;
+  archiveUrl?: string;
+  description?: string;
 }
 
 export interface BookmarkFolder {
@@ -34,6 +39,15 @@ export interface BookmarkFolder {
   path: string[];
   bookmarks: Bookmark[];
   subfolders: BookmarkFolder[];
+  firefoxGuid?: string;
+}
+
+export interface SyncHistoryEntry {
+  date: number;
+  source: string;
+  added: number;
+  updated: number;
+  unchanged: number;
 }
 
 export interface BookmarksData {
@@ -46,6 +60,11 @@ export interface BookmarksData {
     checkedCount: number;
     previewsGenerated: number;
     lastBuild: number;
+  };
+  syncInfo?: {
+    lastImportSource?: string;
+    lastImportDate?: number;
+    importHistory: SyncHistoryEntry[];
   };
 }
 

@@ -8,6 +8,7 @@ export interface ParsedNode {
   lastModified?: number;
   icon?: string;
   children?: ParsedNode[];
+  firefoxGuid?: string;
 }
 
 /**

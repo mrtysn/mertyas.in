@@ -8,6 +8,7 @@ export interface ParsedNode {
   lastModified?: number;
   icon?: string;
   children?: ParsedNode[];
+  firefoxGuid?: string;
 }
 
 interface FirefoxNode {
@@ -57,6 +58,7 @@ function parseNode(node: FirefoxNode): ParsedNode | null {
       addDate: node.dateAdded ? Math.floor(node.dateAdded / 1000000) : undefined, // Convert microseconds to seconds
       lastModified: node.lastModified ? Math.floor(node.lastModified / 1000000) : undefined,
       children: parseChildren(node.children || []),
+      firefoxGuid: node.guid || undefined,
     };
   } else if (node.typeCode === 1 && node.uri) {
     // Bookmark
@@ -67,6 +69,7 @@ function parseNode(node: FirefoxNode): ParsedNode | null {
       addDate: node.dateAdded ? Math.floor(node.dateAdded / 1000000) : undefined,
       lastModified: node.lastModified ? Math.floor(node.lastModified / 1000000) : undefined,
       icon: node.icon || undefined, // Base64 data URI
+      firefoxGuid: node.guid || undefined,
     };
   }
 

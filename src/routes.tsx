@@ -27,6 +27,10 @@ export const routes: RouteProps[] = [
     component: Bookmarks,
   },
   {
+    path: "/bookmarks/:rest*",
+    component: Bookmarks,
+  },
+  {
     path: "/posts",
     component: Posts,
   },

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Bookmark } from '../utils/types';
 
 interface BookmarkCardProps {
@@ -12,10 +13,21 @@ function getStatusClass(code: number): string {
   return 'unknown';
 }
 
+function formatDate(timestamp: number): string {
+  return new Date(timestamp * 1000).toLocaleDateString();
+}
+
 function BookmarkCard({ bookmark }: BookmarkCardProps) {
+  const [expanded, setExpanded] = useState(false);
+
+  const isDead = bookmark.statusCode !== undefined &&
+    (bookmark.statusCode === 0 || bookmark.statusCode >= 400);
+  const hasArchive = !!bookmark.archiveUrl;
+  const href = isDead && hasArchive ? bookmark.archiveUrl! : bookmark.url;
+
   return (
-    <article className="bookmark-card">
-      <a href={bookmark.url} target="_blank" rel="noopener noreferrer">
+    <article className={`bookmark-card${expanded ? ' expanded' : ''}`}>
+      <a href={href} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>
         <div className="bookmark-favicon">
           {bookmark.icon ? (
             <img src={bookmark.icon} alt="" />
@@ -32,10 +44,14 @@ function BookmarkCard({ bookmark }: BookmarkCardProps) {
             {new URL(bookmark.url).hostname}
           </small>
 
-          {bookmark.statusCode && (
+          {bookmark.statusCode !== undefined && bookmark.statusCode > 0 && (
             <span className={`status status-${getStatusClass(bookmark.statusCode)}`}>
               {bookmark.statusCode}
             </span>
+          )}
+
+          {hasArchive && (
+            <span className="status status-archived">archived</span>
           )}
 
           {bookmark.tags.length > 0 && (
@@ -49,6 +65,47 @@ function BookmarkCard({ bookmark }: BookmarkCardProps) {
           )}
         </div>
       </a>
+
+      <button
+        className="bookmark-expand-btn"
+        onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }}
+        aria-label={expanded ? 'Collapse details' : 'Expand details'}
+      >
+        {expanded ? '\u25B2' : '\u25BC'}
+      </button>
+
+      {expanded && (
+        <div className="bookmark-details">
+          <div className="detail-row">
+            <span className="detail-label">URL</span>
+            <a href={bookmark.url} target="_blank" rel="noopener noreferrer" className="detail-value detail-url">
+              {bookmark.url}
+            </a>
+          </div>
+          {bookmark.description && (
+            <div className="detail-row">
+              <span className="detail-label">Description</span>
+              <span className="detail-value">{bookmark.description}</span>
+            </div>
+          )}
+          <div className="detail-row">
+            <span className="detail-label">Added</span>
+            <span className="detail-value">{formatDate(bookmark.addDate)}</span>
+          </div>
+          {bookmark.archiveUrl && (
+            <div className="detail-row">
+              <span className="detail-label">Archive</span>
+              <a href={bookmark.archiveUrl} target="_blank" rel="noopener noreferrer" className="detail-value detail-url">
+                Wayback Machine
+              </a>
+            </div>
+          )}
+          <div className="detail-row">
+            <span className="detail-label">Folder</span>
+            <span className="detail-value">{bookmark.folderPath.join(' / ')}</span>
+          </div>
+        </div>
+      )}
     </article>
   );
 }

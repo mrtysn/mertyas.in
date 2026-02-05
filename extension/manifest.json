@@ -1,0 +1,14 @@
+{
+  "manifest_version": 2,
+  "name": "Bookmarks Sync",
+  "version": "1.0.0",
+  "description": "Export and import bookmarks for mertyas.in sync",
+  "permissions": [
+    "bookmarks",
+    "downloads"
+  ],
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_title": "Bookmarks Sync"
+  }
+}
