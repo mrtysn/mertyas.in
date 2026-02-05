@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bookmark Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4/dist/full.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .diff-added { background: #dcfce7; }
+    .diff-removed { background: #fce7e7; }
+    .diff-changed { background: #fef9c3; }
+    .fade-in { animation: fadeIn 0.2s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    body { min-height: 100vh; }
+  </style>
+</head>
+<body class="bg-base-200 min-h-screen">
+
+  <!-- Navbar -->
+  <div class="navbar bg-base-100 shadow-sm px-6">
+    <div class="flex-1">
+      <span class="text-xl font-bold">Bookmark Admin</span>
+    </div>
+    <div class="flex-none gap-2">
+      <span id="bookmark-count" class="badge badge-ghost"></span>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="px-6 pt-4">
+    <div role="tablist" class="tabs tabs-bordered">
+      <a role="tab" class="tab tab-active" data-tab="review">Review Suggestions</a>
+      <a role="tab" class="tab" data-tab="organize">Organize</a>
+      <a role="tab" class="tab" data-tab="health">Health</a>
+      <a role="tab" class="tab" data-tab="sync">Sync</a>
+      <a role="tab" class="tab" data-tab="edit">Edit</a>
+    </div>
+  </div>
+
+  <!-- Tab Panels -->
+  <div class="p-6">
+
+    <!-- ===== REVIEW TAB ===== -->
+    <div id="panel-review" class="tab-panel">
+      <!-- Controls -->
+      <div class="flex flex-wrap gap-3 items-center mb-4">
+        <select id="review-confidence" class="select select-bordered select-sm">
+          <option value="all">All confidence</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+        <select id="review-folder" class="select select-bordered select-sm">
+          <option value="">All folders</option>
+        </select>
+        <button class="btn btn-sm btn-success" onclick="acceptAllHigh()">Accept all high-confidence</button>
+        <span id="review-progress" class="text-sm text-base-content/60"></span>
+      </div>
+      <!-- Cards -->
+      <div id="review-cards" class="space-y-4"></div>
+      <div id="review-empty" class="text-center py-12 text-base-content/50 hidden">
+        No suggestions to review. Run LLM Organize to generate suggestions.
+      </div>
+    </div>
+
+    <!-- ===== ORGANIZE TAB ===== -->
+    <div id="panel-organize" class="tab-panel hidden">
+      <div class="card bg-base-100 shadow-sm max-w-xl">
+        <div class="card-body">
+          <h2 class="card-title">LLM Organization</h2>
+          <p class="text-sm text-base-content/60">Send bookmarks to Claude API for description, tag, and folder suggestions.</p>
+
+          <div class="form-control mt-4">
+            <label class="label"><span class="label-text">ANTHROPIC_API_KEY</span></label>
+            <input id="org-api-key" type="password" class="input input-bordered" placeholder="sk-ant-...">
+          </div>
+
+          <div class="form-control mt-2">
+            <label class="label"><span class="label-text">Folder (optional)</span></label>
+            <select id="org-folder" class="select select-bordered">
+              <option value="">All folders</option>
+            </select>
+          </div>
+
+          <div class="form-control mt-2">
+            <label class="label"><span class="label-text">Batch size: <span id="org-batch-label">50</span></span></label>
+            <input id="org-batch-size" type="range" min="10" max="100" value="50" class="range range-sm" oninput="document.getElementById('org-batch-label').textContent=this.value">
+          </div>
+
+          <div class="card-actions mt-4">
+            <button id="org-start" class="btn btn-primary" onclick="startOrganize()">Start</button>
+          </div>
+
+          <div id="org-progress" class="mt-4 hidden">
+            <progress id="org-progress-bar" class="progress progress-primary w-full" value="0" max="100"></progress>
+            <div id="org-progress-text" class="text-sm mt-1"></div>
+            <div id="org-log" class="mt-2 bg-base-200 p-3 rounded text-xs font-mono max-h-48 overflow-y-auto"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== HEALTH TAB ===== -->
+    <div id="panel-health" class="tab-panel hidden">
+      <!-- Stats -->
+      <div id="health-stats" class="stats shadow mb-6 w-full">
+        <div class="stat"><div class="stat-title">Total</div><div class="stat-value" id="stat-total">-</div></div>
+        <div class="stat"><div class="stat-title">Live</div><div class="stat-value text-success" id="stat-live">-</div></div>
+        <div class="stat"><div class="stat-title">Dead</div><div class="stat-value text-error" id="stat-dead">-</div></div>
+        <div class="stat"><div class="stat-title">Archived</div><div class="stat-value text-info" id="stat-archived">-</div></div>
+        <div class="stat"><div class="stat-title">Unchecked</div><div class="stat-value text-warning" id="stat-unchecked">-</div></div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <!-- Link check -->
+        <div class="card bg-base-100 shadow-sm">
+          <div class="card-body">
+            <h3 class="card-title text-base">Link Check</h3>
+            <p class="text-sm text-base-content/60">Check all bookmark URLs for dead links.</p>
+            <div class="card-actions mt-2">
+              <button id="health-link-btn" class="btn btn-sm btn-primary" onclick="startLinkCheck()">Run Link Check</button>
+            </div>
+            <div id="link-check-progress" class="hidden mt-2">
+              <progress id="link-progress-bar" class="progress progress-primary w-full" value="0" max="100"></progress>
+              <span id="link-progress-text" class="text-xs"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wayback -->
+        <div class="card bg-base-100 shadow-sm">
+          <div class="card-body">
+            <h3 class="card-title text-base">Wayback Machine</h3>
+            <p class="text-sm text-base-content/60">Find archived versions of dead links (~1 req/sec).</p>
+            <div class="card-actions mt-2">
+              <button id="health-wayback-btn" class="btn btn-sm btn-secondary" onclick="startWayback()">Check Dead Links</button>
+            </div>
+            <div id="wayback-progress" class="hidden mt-2">
+              <progress id="wayback-progress-bar" class="progress progress-secondary w-full" value="0" max="100"></progress>
+              <span id="wayback-progress-text" class="text-xs"></span>
+            </div>
+            <div id="wayback-log" class="hidden mt-2 bg-base-200 p-2 rounded text-xs font-mono max-h-32 overflow-y-auto"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dead bookmarks table -->
+      <h3 class="text-lg font-semibold mb-2">Dead / Error Bookmarks</h3>
+      <div class="overflow-x-auto">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>URL</th>
+              <th>Status</th>
+              <th>Archive</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="dead-bookmarks-table"></tbody>
+        </table>
+        <div id="dead-empty" class="text-center py-6 text-base-content/50 hidden">No dead bookmarks found.</div>
+      </div>
+    </div>
+
+    <!-- ===== SYNC TAB ===== -->
+    <div id="panel-sync" class="tab-panel hidden">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Import -->
+        <div class="card bg-base-100 shadow-sm">
+          <div class="card-body">
+            <h3 class="card-title text-base">Import</h3>
+            <input type="file" id="import-file" accept=".json,.html,.htm" class="file-input file-input-bordered file-input-sm w-full">
+            <label class="label cursor-pointer justify-start gap-2 mt-2">
+              <input type="checkbox" id="import-force" class="checkbox checkbox-sm">
+              <span class="label-text text-xs">Force replace (destructive)</span>
+            </label>
+            <button class="btn btn-sm btn-primary mt-2" onclick="doImport()">Import</button>
+            <div id="import-result" class="mt-2 hidden"></div>
+          </div>
+        </div>
+
+        <!-- Export -->
+        <div class="card bg-base-100 shadow-sm">
+          <div class="card-body">
+            <h3 class="card-title text-base">Export</h3>
+            <p class="text-sm text-base-content/60">Download as Firefox-compatible JSON.</p>
+            <span id="export-count" class="text-sm"></span>
+            <button class="btn btn-sm btn-primary mt-2" onclick="doExport()">Download Firefox JSON</button>
+          </div>
+        </div>
+
+        <!-- Diff -->
+        <div class="card bg-base-100 shadow-sm">
+          <div class="card-body">
+            <h3 class="card-title text-base">Diff</h3>
+            <input type="file" id="diff-file" accept=".json,.html,.htm" class="file-input file-input-bordered file-input-sm w-full">
+            <button class="btn btn-sm btn-secondary mt-2" onclick="doDiff()">Compare</button>
+          </div>
+        </div>
+      </div>
+      <!-- Diff results -->
+      <div id="diff-result" class="mt-4 hidden"></div>
+    </div>
+
+    <!-- ===== EDIT TAB ===== -->
+    <div id="panel-edit" class="tab-panel hidden">
+      <div class="form-control mb-4">
+        <input id="edit-search" type="text" class="input input-bordered" placeholder="Search bookmarks (title, URL, tags, description)..." oninput="searchBookmarks()">
+      </div>
+      <div id="edit-results" class="space-y-2"></div>
+      <div id="edit-empty" class="text-center py-12 text-base-content/50">Type to search bookmarks.</div>
+    </div>
+
+  </div>
+
+  <!-- Edit Modal -->
+  <dialog id="edit-modal" class="modal">
+    <div class="modal-box">
+      <h3 class="text-lg font-bold mb-4">Edit Bookmark</h3>
+      <input type="hidden" id="edit-id">
+      <div class="form-control mb-2">
+        <label class="label"><span class="label-text">Title</span></label>
+        <input id="edit-title" type="text" class="input input-bordered">
+      </div>
+      <div class="form-control mb-2">
+        <label class="label"><span class="label-text">Description</span></label>
+        <textarea id="edit-description" class="textarea textarea-bordered" rows="2"></textarea>
+      </div>
+      <div class="form-control mb-2">
+        <label class="label"><span class="label-text">Tags (comma-separated)</span></label>
+        <input id="edit-tags" type="text" class="input input-bordered">
+      </div>
+      <div class="form-control mb-2">
+        <label class="label"><span class="label-text">Folder path (slash-separated)</span></label>
+        <input id="edit-folder" type="text" class="input input-bordered">
+      </div>
+      <div class="modal-action">
+        <button class="btn btn-error btn-sm" onclick="deleteBookmark()">Delete</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('edit-modal').close()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveBookmark()">Save</button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
+
+  <!-- Edit & Accept Modal -->
+  <dialog id="edit-accept-modal" class="modal">
+    <div class="modal-box">
+      <h3 class="text-lg font-bold mb-4">Edit & Accept Suggestion</h3>
+      <input type="hidden" id="ea-id">
+      <div class="form-control mb-2">
+        <label class="label"><span class="label-text">Description</span></label>
+        <textarea id="ea-description" class="textarea textarea-bordered" rows="2"></textarea>
+      </div>
+      <div class="form-control mb-2">
+        <label class="label"><span class="label-text">Tags (comma-separated)</span></label>
+        <input id="ea-tags" type="text" class="input input-bordered">
+      </div>
+      <div class="modal-action">
+        <button class="btn btn-ghost" onclick="document.getElementById('edit-accept-modal').close()">Cancel</button>
+        <button class="btn btn-primary" onclick="submitEditAccept()">Accept</button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
+
+<script>
+// ----- State -----
+let allSuggestions = [];
+let allBookmarks = [];
+let allFolders = [];
+
+// ----- Tab Navigation -----
+const tabs = document.querySelectorAll('[data-tab]');
+const panels = document.querySelectorAll('.tab-panel');
+
+function switchTab(name) {
+  tabs.forEach(t => t.classList.toggle('tab-active', t.dataset.tab === name));
+  panels.forEach(p => p.classList.toggle('hidden', p.id !== `panel-${name}`));
+  window.location.hash = name;
+}
+
+tabs.forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
+
+// ----- Init -----
+async function init() {
+  const hash = window.location.hash.slice(1);
+  if (hash) switchTab(hash);
+
+  await Promise.all([loadBookmarks(), loadSuggestions(), loadFolders(), loadStats()]);
+  renderReview();
+  populateExportCount();
+}
+
+async function loadBookmarks() {
+  const res = await fetch('/api/bookmarks');
+  const data = await res.json();
+  allBookmarks = data.flatBookmarks || [];
+  document.getElementById('bookmark-count').textContent = `${allBookmarks.length} bookmarks`;
+}
+
+async function loadSuggestions() {
+  const res = await fetch('/api/suggestions');
+  allSuggestions = await res.json();
+}
+
+async function loadFolders() {
+  const res = await fetch('/api/folders');
+  allFolders = await res.json();
+  // Populate folder dropdowns
+  for (const sel of [document.getElementById('review-folder'), document.getElementById('org-folder')]) {
+    const val = sel.value;
+    sel.innerHTML = '<option value="">All folders</option>';
+    for (const f of allFolders) {
+      sel.innerHTML += `<option value="${esc(f)}">${esc(f)}</option>`;
+    }
+    sel.value = val;
+  }
+}
+
+async function loadStats() {
+  const res = await fetch('/api/stats');
+  const s = await res.json();
+  document.getElementById('stat-total').textContent = s.total;
+  document.getElementById('stat-live').textContent = s.live;
+  document.getElementById('stat-dead').textContent = s.dead;
+  document.getElementById('stat-archived').textContent = s.archived;
+  document.getElementById('stat-unchecked').textContent = s.unchecked;
+  renderDeadTable();
+}
+
+function populateExportCount() {
+  document.getElementById('export-count').textContent = `${allBookmarks.length} bookmarks will be exported`;
+}
+
+// ----- Helpers -----
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function confidenceBadge(c) {
+  const cls = c === 'high' ? 'badge-success' : c === 'medium' ? 'badge-warning' : 'badge-error';
+  return `<span class="badge ${cls} badge-sm">${c}</span>`;
+}
+
+function statusBadge(code) {
+  if (!code && code !== 0) return '<span class="badge badge-ghost badge-sm">unchecked</span>';
+  if (code >= 200 && code < 400) return `<span class="badge badge-success badge-sm">${code}</span>`;
+  if (code === 0) return '<span class="badge badge-error badge-sm">timeout</span>';
+  return `<span class="badge badge-error badge-sm">${code}</span>`;
+}
+
+function truncate(s, n) {
+  if (!s) return '';
+  return s.length > n ? s.slice(0, n) + '...' : s;
+}
+
+// ----- Review Tab -----
+function getFilteredSuggestions() {
+  let s = allSuggestions;
+  const conf = document.getElementById('review-confidence').value;
+  if (conf !== 'all') s = s.filter(x => x.confidence === conf);
+  const folder = document.getElementById('review-folder').value;
+  if (folder) {
+    const bmIds = new Set(allBookmarks.filter(b => b.folderPath.join('/') === folder).map(b => b.id));
+    s = s.filter(x => bmIds.has(x.bookmarkId));
+  }
+  return s;
+}
+
+function renderReview() {
+  const filtered = getFilteredSuggestions();
+  const total = allSuggestions.length;
+  document.getElementById('review-progress').textContent = total > 0 ? `${total} suggestions remaining` : '';
+  document.getElementById('review-empty').classList.toggle('hidden', filtered.length > 0);
+
+  const container = document.getElementById('review-cards');
+  container.innerHTML = '';
+
+  for (const s of filtered) {
+    const bm = allBookmarks.find(b => b.id === s.bookmarkId);
+    const card = document.createElement('div');
+    card.className = 'card bg-base-100 shadow-sm fade-in';
+    card.innerHTML = `
+      <div class="card-body p-4">
+        <div class="flex items-start justify-between gap-2">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              ${bm?.icon ? `<img src="${esc(bm.icon)}" class="w-4 h-4" onerror="this.style.display='none'">` : ''}
+              <span class="font-semibold truncate">${esc(s.bookmarkTitle)}</span>
+              ${confidenceBadge(s.confidence)}
+            </div>
+            <a href="${esc(s.bookmarkUrl)}" target="_blank" class="text-xs text-primary truncate block">${esc(s.bookmarkUrl)}</a>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mt-3 text-sm">
+          <div>
+            <div class="font-medium text-xs text-base-content/50 uppercase mb-1">Current</div>
+            <div><span class="text-base-content/60">Description:</span> ${esc(bm?.description || '(none)')}</div>
+            <div><span class="text-base-content/60">Tags:</span> ${bm?.tags?.length ? bm.tags.map(t => `<span class="badge badge-ghost badge-xs">${esc(t)}</span>`).join(' ') : '(none)'}</div>
+            <div><span class="text-base-content/60">Folder:</span> ${esc(bm?.folderPath?.join('/') || '(root)')}</div>
+          </div>
+          <div>
+            <div class="font-medium text-xs text-base-content/50 uppercase mb-1">Suggested</div>
+            <div><span class="text-base-content/60">Description:</span> ${esc(s.suggestedDescription)}</div>
+            <div><span class="text-base-content/60">Tags:</span> ${s.suggestedTags.map(t => `<span class="badge badge-primary badge-xs">${esc(t)}</span>`).join(' ')}</div>
+            <div><span class="text-base-content/60">Folder:</span> ${esc(s.suggestedFolderPath?.join('/') || '(unchanged)')}</div>
+          </div>
+        </div>
+
+        <div class="collapse collapse-arrow bg-base-200 mt-2">
+          <input type="checkbox">
+          <div class="collapse-title text-xs font-medium py-2 min-h-0">Reasoning</div>
+          <div class="collapse-content text-xs"><p>${esc(s.reasoning)}</p></div>
+        </div>
+
+        <div class="flex gap-2 mt-3">
+          <button class="btn btn-sm btn-success" onclick="acceptSuggestion('${s.bookmarkId}')">Accept</button>
+          <button class="btn btn-sm btn-ghost" onclick="editAndAccept('${s.bookmarkId}')">Edit & Accept</button>
+          <button class="btn btn-sm btn-error btn-outline" onclick="rejectSuggestion('${s.bookmarkId}')">Reject</button>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  }
+}
+
+document.getElementById('review-confidence').addEventListener('change', renderReview);
+document.getElementById('review-folder').addEventListener('change', renderReview);
+
+async function acceptSuggestion(id) {
+  await fetch(`/api/suggestion/${id}/accept`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  allSuggestions = allSuggestions.filter(s => s.bookmarkId !== id);
+  await loadBookmarks();
+  renderReview();
+}
+
+async function rejectSuggestion(id) {
+  await fetch(`/api/suggestion/${id}/reject`, { method: 'POST' });
+  allSuggestions = allSuggestions.filter(s => s.bookmarkId !== id);
+  renderReview();
+}
+
+function editAndAccept(id) {
+  const s = allSuggestions.find(x => x.bookmarkId === id);
+  if (!s) return;
+  document.getElementById('ea-id').value = id;
+  document.getElementById('ea-description').value = s.suggestedDescription;
+  document.getElementById('ea-tags').value = s.suggestedTags.join(', ');
+  document.getElementById('edit-accept-modal').showModal();
+}
+
+async function submitEditAccept() {
+  const id = document.getElementById('ea-id').value;
+  const description = document.getElementById('ea-description').value;
+  const tags = document.getElementById('ea-tags').value.split(',').map(t => t.trim()).filter(Boolean);
+  await fetch(`/api/suggestion/${id}/accept`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ description, tags }),
+  });
+  document.getElementById('edit-accept-modal').close();
+  allSuggestions = allSuggestions.filter(s => s.bookmarkId !== id);
+  await loadBookmarks();
+  renderReview();
+}
+
+async function acceptAllHigh() {
+  if (!confirm('Accept all high-confidence suggestions?')) return;
+  const res = await fetch('/api/suggestions/accept-high', { method: 'POST' });
+  const data = await res.json();
+  alert(`Accepted ${data.accepted} suggestions. ${data.remaining} remaining.`);
+  await Promise.all([loadBookmarks(), loadSuggestions()]);
+  renderReview();
+}
+
+// ----- Organize Tab -----
+async function startOrganize() {
+  const btn = document.getElementById('org-start');
+  btn.disabled = true;
+  btn.textContent = 'Running...';
+
+  const progressEl = document.getElementById('org-progress');
+  progressEl.classList.remove('hidden');
+  const bar = document.getElementById('org-progress-bar');
+  const text = document.getElementById('org-progress-text');
+  const log = document.getElementById('org-log');
+  log.innerHTML = '';
+
+  const body = {
+    apiKey: document.getElementById('org-api-key').value || undefined,
+    folder: document.getElementById('org-folder').value || undefined,
+    batchSize: parseInt(document.getElementById('org-batch-size').value),
+  };
+
+  try {
+    const response = await fetch('/api/organize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      let eventType = '';
+      for (const line of lines) {
+        if (line.startsWith('event: ')) {
+          eventType = line.slice(7);
+        } else if (line.startsWith('data: ')) {
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (eventType === 'progress') {
+              const pct = data.totalBatches ? Math.round((data.batch / data.totalBatches) * 100) : 0;
+              bar.value = pct;
+              text.textContent = `Batch ${data.batch}/${data.totalBatches} — ${data.suggestionsCount} suggestions`;
+            } else if (eventType === 'complete') {
+              bar.value = 100;
+              text.textContent = `Complete! ${data.totalSuggestions} total suggestions.`;
+              log.innerHTML += `<div class="text-success">Complete: ${data.totalSuggestions} suggestions</div>`;
+            } else if (eventType === 'error') {
+              log.innerHTML += `<div class="text-error">${esc(data.message)}</div>`;
+            } else if (eventType === 'info') {
+              log.innerHTML += `<div>${esc(data.message)}</div>`;
+            }
+          } catch {}
+          eventType = '';
+        }
+      }
+    }
+  } catch (err) {
+    log.innerHTML += `<div class="text-error">Connection error: ${esc(err.message)}</div>`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Start';
+  await loadSuggestions();
+  renderReview();
+}
+
+// ----- Health Tab -----
+function renderDeadTable() {
+  const dead = allBookmarks.filter(b => b.statusCode === 0 || (b.statusCode && b.statusCode >= 400));
+  const tbody = document.getElementById('dead-bookmarks-table');
+  const emptyEl = document.getElementById('dead-empty');
+
+  if (dead.length === 0) {
+    tbody.innerHTML = '';
+    emptyEl.classList.remove('hidden');
+    return;
+  }
+  emptyEl.classList.add('hidden');
+
+  tbody.innerHTML = dead.map(b => `
+    <tr>
+      <td class="max-w-[200px] truncate">${esc(b.title)}</td>
+      <td class="max-w-[250px] truncate"><a href="${esc(b.url)}" target="_blank" class="link link-primary text-xs">${esc(b.url)}</a></td>
+      <td>${statusBadge(b.statusCode)}</td>
+      <td>${b.archiveUrl ? `<a href="${esc(b.archiveUrl)}" target="_blank" class="link link-info text-xs">archive</a>` : '-'}</td>
+      <td><button class="btn btn-xs btn-error btn-outline" onclick="deleteBookmarkById('${b.id}')">Delete</button></td>
+    </tr>
+  `).join('');
+}
+
+async function startLinkCheck() {
+  const btn = document.getElementById('health-link-btn');
+  btn.disabled = true;
+  const progressEl = document.getElementById('link-check-progress');
+  progressEl.classList.remove('hidden');
+  const bar = document.getElementById('link-progress-bar');
+  const text = document.getElementById('link-progress-text');
+
+  try {
+    const response = await fetch('/api/link-check', { method: 'POST' });
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+      let eventType = '';
+      for (const line of lines) {
+        if (line.startsWith('event: ')) eventType = line.slice(7);
+        else if (line.startsWith('data: ')) {
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (eventType === 'progress') {
+              const pct = data.total ? Math.round((data.checked / data.total) * 100) : 0;
+              bar.value = pct;
+              text.textContent = `${data.checked}/${data.total} checked`;
+            } else if (eventType === 'complete') {
+              bar.value = 100;
+              text.textContent = 'Link check complete!';
+            }
+          } catch {}
+          eventType = '';
+        }
+      }
+    }
+  } catch (err) {
+    text.textContent = 'Error: ' + err.message;
+  }
+
+  btn.disabled = false;
+  await Promise.all([loadBookmarks(), loadStats()]);
+}
+
+async function startWayback() {
+  const btn = document.getElementById('health-wayback-btn');
+  btn.disabled = true;
+  const progressEl = document.getElementById('wayback-progress');
+  progressEl.classList.remove('hidden');
+  const bar = document.getElementById('wayback-progress-bar');
+  const text = document.getElementById('wayback-progress-text');
+  const log = document.getElementById('wayback-log');
+  log.classList.remove('hidden');
+  log.innerHTML = '';
+
+  try {
+    const response = await fetch('/api/wayback', { method: 'POST' });
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+      let eventType = '';
+      for (const line of lines) {
+        if (line.startsWith('event: ')) eventType = line.slice(7);
+        else if (line.startsWith('data: ')) {
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (eventType === 'progress') {
+              const pct = data.total ? Math.round((data.checked / data.total) * 100) : 0;
+              bar.value = pct;
+              text.textContent = `${data.checked}/${data.total} checked, ${data.found} archived`;
+            } else if (eventType === 'found') {
+              log.innerHTML += `<div class="text-info">${esc(data.bookmarkTitle)} &rarr; <a href="${esc(data.archiveUrl)}" target="_blank" class="link">archive</a></div>`;
+            } else if (eventType === 'complete') {
+              bar.value = 100;
+              text.textContent = `Complete! ${data.found} archives found.`;
+            }
+          } catch {}
+          eventType = '';
+        }
+      }
+    }
+  } catch (err) {
+    text.textContent = 'Error: ' + err.message;
+  }
+
+  btn.disabled = false;
+  await Promise.all([loadBookmarks(), loadStats()]);
+}
+
+async function deleteBookmarkById(id) {
+  if (!confirm('Delete this bookmark?')) return;
+  await fetch(`/api/bookmark/${id}`, { method: 'DELETE' });
+  await Promise.all([loadBookmarks(), loadStats()]);
+}
+
+// ----- Sync Tab -----
+async function doImport() {
+  const fileInput = document.getElementById('import-file');
+  const file = fileInput.files[0];
+  if (!file) return alert('Select a file first');
+
+  const content = await file.text();
+  const forceReplace = document.getElementById('import-force').checked;
+
+  const res = await fetch('/api/import', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content, filename: file.name, forceReplace }),
+  });
+  const data = await res.json();
+
+  const resultEl = document.getElementById('import-result');
+  resultEl.classList.remove('hidden');
+
+  if (data.ok) {
+    resultEl.innerHTML = `
+      <div class="alert alert-success text-sm">
+        Import complete: +${data.added} added, ~${data.updated} updated, =${data.unchanged} unchanged, !${data.conflicts} conflicts. Total: ${data.total}
+      </div>`;
+    await Promise.all([loadBookmarks(), loadFolders(), loadStats()]);
+    populateExportCount();
+  } else {
+    resultEl.innerHTML = `<div class="alert alert-error text-sm">${esc(data.error)}</div>`;
+  }
+}
+
+function doExport() {
+  window.location.href = '/api/export';
+}
+
+async function doDiff() {
+  const fileInput = document.getElementById('diff-file');
+  const file = fileInput.files[0];
+  if (!file) return alert('Select a file first');
+
+  const content = await file.text();
+  const res = await fetch('/api/diff', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content, filename: file.name }),
+  });
+  const data = await res.json();
+
+  const resultEl = document.getElementById('diff-result');
+  resultEl.classList.remove('hidden');
+
+  if (data.error) {
+    resultEl.innerHTML = `<div class="alert alert-error text-sm">${esc(data.error)}</div>`;
+    return;
+  }
+
+  const total = data.onlyLocal.length + data.onlyFirefox.length + data.titleChanged.length + data.folderChanged.length;
+  if (total === 0) {
+    resultEl.innerHTML = '<div class="alert alert-success text-sm">No differences found.</div>';
+    return;
+  }
+
+  let html = '<div class="space-y-4">';
+
+  if (data.onlyLocal.length) {
+    html += `<div><h4 class="font-semibold text-sm mb-1">Only in local (${data.onlyLocal.length})</h4>
+      <div class="overflow-x-auto"><table class="table table-xs"><thead><tr><th>Title</th><th>URL</th></tr></thead><tbody>
+      ${data.onlyLocal.slice(0, 30).map(b => `<tr class="diff-added"><td>${esc(b.title)}</td><td class="text-xs">${esc(b.url)}</td></tr>`).join('')}
+      </tbody></table></div></div>`;
+  }
+
+  if (data.onlyFirefox.length) {
+    html += `<div><h4 class="font-semibold text-sm mb-1">Only in Firefox (${data.onlyFirefox.length})</h4>
+      <div class="overflow-x-auto"><table class="table table-xs"><thead><tr><th>Title</th><th>URL</th></tr></thead><tbody>
+      ${data.onlyFirefox.slice(0, 30).map(b => `<tr class="diff-removed"><td>${esc(b.title)}</td><td class="text-xs">${esc(b.url)}</td></tr>`).join('')}
+      </tbody></table></div></div>`;
+  }
+
+  if (data.titleChanged.length) {
+    html += `<div><h4 class="font-semibold text-sm mb-1">Title changes (${data.titleChanged.length})</h4>
+      <div class="overflow-x-auto"><table class="table table-xs"><thead><tr><th>Local</th><th>Firefox</th></tr></thead><tbody>
+      ${data.titleChanged.slice(0, 30).map(c => `<tr class="diff-changed"><td>${esc(c.localTitle)}</td><td>${esc(c.firefoxTitle)}</td></tr>`).join('')}
+      </tbody></table></div></div>`;
+  }
+
+  if (data.folderChanged.length) {
+    html += `<div><h4 class="font-semibold text-sm mb-1">Folder changes (${data.folderChanged.length})</h4>
+      <div class="overflow-x-auto"><table class="table table-xs"><thead><tr><th>Title</th><th>Local folder</th><th>Firefox folder</th></tr></thead><tbody>
+      ${data.folderChanged.slice(0, 30).map(c => `<tr class="diff-changed"><td>${esc(c.title)}</td><td>${esc(c.localFolder)}</td><td>${esc(c.firefoxFolder)}</td></tr>`).join('')}
+      </tbody></table></div></div>`;
+  }
+
+  html += '</div>';
+  resultEl.innerHTML = html;
+}
+
+// ----- Edit Tab -----
+let searchTimeout;
+function searchBookmarks() {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(doSearch, 200);
+}
+
+function doSearch() {
+  const q = document.getElementById('edit-search').value.toLowerCase().trim();
+  const container = document.getElementById('edit-results');
+  const emptyEl = document.getElementById('edit-empty');
+
+  if (!q) {
+    container.innerHTML = '';
+    emptyEl.classList.remove('hidden');
+    return;
+  }
+  emptyEl.classList.add('hidden');
+
+  const matches = allBookmarks.filter(b =>
+    b.title.toLowerCase().includes(q) ||
+    b.url.toLowerCase().includes(q) ||
+    (b.description || '').toLowerCase().includes(q) ||
+    b.tags.some(t => t.toLowerCase().includes(q))
+  ).slice(0, 50);
+
+  if (matches.length === 0) {
+    container.innerHTML = '<div class="text-center py-4 text-base-content/50">No matches.</div>';
+    return;
+  }
+
+  container.innerHTML = matches.map(b => `
+    <div class="card bg-base-100 shadow-sm cursor-pointer hover:shadow-md transition-shadow" onclick="openEditModal('${b.id}')">
+      <div class="card-body p-3 flex-row items-center gap-3">
+        ${b.icon ? `<img src="${esc(b.icon)}" class="w-4 h-4 shrink-0" onerror="this.style.display='none'">` : '<div class="w-4 h-4 shrink-0"></div>'}
+        <div class="flex-1 min-w-0">
+          <div class="font-medium text-sm truncate">${esc(b.title)}</div>
+          <div class="text-xs text-base-content/50 truncate">${esc(b.url)}</div>
+        </div>
+        <div class="shrink-0 flex gap-1">
+          ${b.tags.slice(0, 3).map(t => `<span class="badge badge-ghost badge-xs">${esc(t)}</span>`).join('')}
+          ${b.tags.length > 3 ? `<span class="badge badge-ghost badge-xs">+${b.tags.length - 3}</span>` : ''}
+        </div>
+        ${statusBadge(b.statusCode)}
+      </div>
+    </div>
+  `).join('');
+}
+
+function openEditModal(id) {
+  const b = allBookmarks.find(x => x.id === id);
+  if (!b) return;
+  document.getElementById('edit-id').value = id;
+  document.getElementById('edit-title').value = b.title;
+  document.getElementById('edit-description').value = b.description || '';
+  document.getElementById('edit-tags').value = b.tags.join(', ');
+  document.getElementById('edit-folder').value = b.folderPath.join('/');
+  document.getElementById('edit-modal').showModal();
+}
+
+async function saveBookmark() {
+  const id = document.getElementById('edit-id').value;
+  const body = {
+    title: document.getElementById('edit-title').value,
+    description: document.getElementById('edit-description').value,
+    tags: document.getElementById('edit-tags').value.split(',').map(t => t.trim()).filter(Boolean),
+    folderPath: document.getElementById('edit-folder').value.split('/').filter(Boolean),
+  };
+  await fetch(`/api/bookmark/${id}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  document.getElementById('edit-modal').close();
+  await loadBookmarks();
+  doSearch();
+}
+
+async function deleteBookmark() {
+  const id = document.getElementById('edit-id').value;
+  if (!confirm('Delete this bookmark permanently?')) return;
+  await fetch(`/api/bookmark/${id}`, { method: 'DELETE' });
+  document.getElementById('edit-modal').close();
+  await Promise.all([loadBookmarks(), loadStats()]);
+  doSearch();
+}
+
+// ----- Auto-detect theme -----
+if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  document.documentElement.setAttribute('data-theme', 'dark');
+}
+
+// ----- Boot -----
+init();
+</script>
+</body>
+</html>

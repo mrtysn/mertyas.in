@@ -19,21 +19,33 @@ interface WaybackResponse {
   };
 }
 
+export interface WaybackProgress {
+  type: 'progress' | 'found' | 'complete';
+  checked?: number;
+  total?: number;
+  found?: number;
+  bookmarkTitle?: string;
+  archiveUrl?: string;
+}
+
 /**
  * Check the Wayback Machine for archived versions of dead bookmarks.
  * Rate limited to 1 request per second per API guidelines.
  */
-export async function checkWayback(bookmarks: Bookmark[]): Promise<number> {
+export async function checkWayback(
+  bookmarks: Bookmark[],
+  onProgress?: (event: WaybackProgress) => void
+): Promise<number> {
+  const emit = onProgress || (() => {});
   const dead = bookmarks.filter(
     b => !b.archiveUrl && (b.statusCode === 0 || (b.statusCode && b.statusCode >= 400))
   );
 
   if (dead.length === 0) {
-    console.log('  No dead bookmarks to check against Wayback Machine');
+    emit({ type: 'complete', found: 0, total: 0 });
     return 0;
   }
 
-  console.log(`Checking ${dead.length} dead bookmarks against Wayback Machine...`);
   let found = 0;
 
   for (let i = 0; i < dead.length; i++) {
@@ -50,13 +62,14 @@ export async function checkWayback(bookmarks: Bookmark[]): Promise<number> {
         if (snapshot?.available && snapshot.url) {
           bookmark.archiveUrl = snapshot.url;
           found++;
+          emit({ type: 'found', checked: i + 1, total: dead.length, found, bookmarkTitle: bookmark.title, archiveUrl: snapshot.url });
         }
       }
     } catch {
       // Silently skip — network errors are expected for rate limiting
     }
 
-    process.stdout.write(`\r  ${i + 1}/${dead.length} checked, ${found} archived`);
+    emit({ type: 'progress', checked: i + 1, total: dead.length, found });
 
     // Rate limit: 1 request per second
     if (i < dead.length - 1) {
@@ -64,7 +77,7 @@ export async function checkWayback(bookmarks: Bookmark[]): Promise<number> {
     }
   }
 
-  console.log('');
+  emit({ type: 'complete', found, total: dead.length });
   return found;
 }
 

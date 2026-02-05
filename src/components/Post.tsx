@@ -6,12 +6,7 @@ import { updateMetaTags } from "../utils/meta";
 function Post() {
   const [, params] = useRoute("/:slug");
   const slug = params?.slug;
-
-  if (!slug) {
-    return <div>Invalid post URL</div>;
-  }
-
-  const post = getPostBySlug(slug);
+  const post = slug ? getPostBySlug(slug) : undefined;
 
   useEffect(() => {
     if (post) {
@@ -25,6 +20,10 @@ function Post() {
       });
     }
   }, [post]);
+
+  if (!slug) {
+    return <div>Invalid post URL</div>;
+  }
 
   if (!post) {
     return (

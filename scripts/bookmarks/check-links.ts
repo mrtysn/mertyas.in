@@ -1,8 +1,15 @@
 import type { Bookmark, BookmarkCache } from '../../src/utils/types.js';
 
-interface CheckLinksOptions {
+export interface CheckLinksOptions {
   recheckAfterDays: number;
   maxConcurrent: number;
+  onProgress?: (event: LinkCheckProgress) => void;
+}
+
+export interface LinkCheckProgress {
+  type: 'progress' | 'complete';
+  checked: number;
+  total: number;
 }
 
 /**
@@ -25,12 +32,12 @@ export async function checkLinks(
     return age > maxAge;
   });
 
+  const emit = options.onProgress || (() => {});
+
   if (toCheck.length === 0) {
-    console.log('✓ All links are up to date');
+    emit({ type: 'complete', checked: 0, total: 0 });
     return;
   }
-
-  console.log(`Checking ${toCheck.length} links...`);
 
   // Process in batches for concurrency control
   for (let i = 0; i < toCheck.length; i += maxConcurrent) {
@@ -38,10 +45,10 @@ export async function checkLinks(
     await Promise.all(batch.map(bookmark => checkLink(bookmark, cache)));
 
     const progress = Math.min(i + maxConcurrent, toCheck.length);
-    process.stdout.write(`\r  ${progress}/${toCheck.length} checked`);
+    emit({ type: 'progress', checked: progress, total: toCheck.length });
   }
 
-  console.log('\n✓ Link checking complete');
+  emit({ type: 'complete', checked: toCheck.length, total: toCheck.length });
 }
 
 /**
@@ -67,11 +74,11 @@ async function checkLink(bookmark: Bookmark, cache: BookmarkCache): Promise<void
       statusCode: response.status,
       checkedAt: Date.now(),
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     cache.bookmarks[bookmark.id].linkCheck = {
       statusCode: 0,
       checkedAt: Date.now(),
-      error: error.message || 'Unknown error',
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }

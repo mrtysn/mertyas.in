@@ -10,29 +10,17 @@ const __dirname = path.dirname(__filename);
 
 const DATA_PATH = path.join(__dirname, '../../src/bookmarks/data/bookmarks.json');
 
-interface DiffResult {
+export interface DiffResult {
   onlyLocal: Array<{ title: string; url: string }>;
   onlyFirefox: Array<{ title: string; url: string }>;
   titleChanged: Array<{ url: string; localTitle: string; firefoxTitle: string }>;
   folderChanged: Array<{ title: string; url: string; localFolder: string; firefoxFolder: string }>;
 }
 
-function diffBookmarks(firefoxPath: string): void {
-  if (!fs.existsSync(DATA_PATH)) {
-    console.error('No local bookmarks.json found');
-    process.exit(1);
-  }
-
-  if (!fs.existsSync(firefoxPath)) {
-    console.error(`Firefox export not found: ${firefoxPath}`);
-    process.exit(1);
-  }
-
-  const local: BookmarksData = JSON.parse(fs.readFileSync(DATA_PATH, 'utf-8'));
-  const parsed = parseFirefoxJson(firefoxPath);
-  const firefox = generateBookmarksData(parsed);
-
-  // Index by URL
+/**
+ * Compare two BookmarksData objects and return the differences.
+ */
+export function computeDiff(local: BookmarksData, firefox: BookmarksData): DiffResult {
   const localByUrl = new Map(local.flatBookmarks.map(b => [b.url, b]));
   const firefoxByUrl = new Map(firefox.flatBookmarks.map(b => [b.url, b]));
 
@@ -78,7 +66,10 @@ function diffBookmarks(firefoxPath: string): void {
     }
   }
 
-  // Report
+  return result;
+}
+
+function printDiff(result: DiffResult): void {
   console.log('Bookmark Diff Report\n');
 
   if (result.onlyLocal.length > 0) {
@@ -125,22 +116,38 @@ function diffBookmarks(firefoxPath: string): void {
   }
 }
 
-// CLI
-const args = process.argv.slice(2);
-let firefoxPath = '';
+// CLI entry point
+if (process.argv[1] && process.argv[1].includes('sync-diff')) {
+  const args = process.argv.slice(2);
+  let firefoxPath = '';
 
-for (let i = 0; i < args.length; i++) {
-  if (args[i] === '--firefox' && args[i + 1]) {
-    firefoxPath = args[i + 1];
-    i++;
-  } else if (!firefoxPath && !args[i].startsWith('--')) {
-    firefoxPath = args[i];
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--firefox' && args[i + 1]) {
+      firefoxPath = args[i + 1];
+      i++;
+    } else if (!firefoxPath && !args[i].startsWith('--')) {
+      firefoxPath = args[i];
+    }
   }
-}
 
-if (!firefoxPath) {
-  console.error('Usage: pnpm bookmarks:diff --firefox <path-to-firefox-export.json>');
-  process.exit(1);
-}
+  if (!firefoxPath) {
+    console.error('Usage: pnpm bookmarks:diff --firefox <path-to-firefox-export.json>');
+    process.exit(1);
+  }
 
-diffBookmarks(firefoxPath);
+  if (!fs.existsSync(DATA_PATH)) {
+    console.error('No local bookmarks.json found');
+    process.exit(1);
+  }
+
+  if (!fs.existsSync(firefoxPath)) {
+    console.error(`Firefox export not found: ${firefoxPath}`);
+    process.exit(1);
+  }
+
+  const local: BookmarksData = JSON.parse(fs.readFileSync(DATA_PATH, 'utf-8'));
+  const parsed = parseFirefoxJson(firefoxPath);
+  const firefox = generateBookmarksData(parsed);
+  const result = computeDiff(local, firefox);
+  printDiff(result);
+}

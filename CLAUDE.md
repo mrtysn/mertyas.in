@@ -55,6 +55,7 @@ pnpm run bookmarks:wayback                # Check Wayback Machine for dead links
 pnpm run bookmarks:export --output <file> # Export to Firefox JSON format
 pnpm run bookmarks:diff --firefox <file>  # Diff local vs Firefox export
 pnpm run bookmarks:migrate                # Migrate data to v2 format
+pnpm run bookmarks:admin                  # Launch bookmark admin UI (dev only, port 5175)
 ```
 
 ## Project Structure
@@ -74,6 +75,7 @@ pnpm run bookmarks:migrate                # Migrate data to v2 format
 ├── scripts/
 │   ├── generate-feeds.ts       # RSS/Atom feed generation
 │   └── bookmarks/              # Bookmark processing scripts (build, merge, parse, organize, export)
+│       └── admin/              # Bookmark admin UI server (Express + single HTML file)
 ├── extension/          # Firefox WebExtension for bookmark sync
 ├── dist/               # Build output (gitignored)
 └── docs/               # Documentation
@@ -103,5 +105,6 @@ Full-featured bookmark management system. Data format is v2.0.0 with merge-based
 3. **LLM Organization** — Claude API batch processing, suggestions cache, interactive/auto-apply modes
 4. **Enhanced UI** — URL-based folder navigation (`/bookmarks/Dev/React`), sort (date/alpha/recently-checked), tag cloud, stats dashboard, expandable detail view, status filter (all/live/dead/archived/unchecked)
 5. **Two-Way Sync** — Firefox JSON export, diff tool, Firefox WebExtension (`extension/`)
+6. **Admin UI** — Browser-based admin at `localhost:5175` for visual curation, LLM organize, health checks, sync, and direct editing. Dev-only, not part of production build. See `docs/bookmarks-admin.md`.
 
 See `docs/bookmarks-plan.md` for the original design document.

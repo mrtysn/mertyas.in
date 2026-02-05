@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 
 const DATA_PATH = path.join(__dirname, '../../src/bookmarks/data/bookmarks.json');
 
-interface FirefoxNode {
+export interface FirefoxNode {
   guid: string;
   title: string;
   index: number;
@@ -75,15 +75,11 @@ function generateGuid(): string {
   return result;
 }
 
-function exportFirefoxJson(outputPath: string): void {
-  if (!fs.existsSync(DATA_PATH)) {
-    console.error('No bookmarks.json found');
-    process.exit(1);
-  }
-
-  const data: BookmarksData = JSON.parse(fs.readFileSync(DATA_PATH, 'utf-8'));
-
-  // Build Firefox root structure
+/**
+ * Convert BookmarksData to a Firefox JSON tree.
+ */
+export function toFirefoxJson(data: BookmarksData): FirefoxNode {
+  nextId = 1; // reset for deterministic output
   const root: FirefoxNode = {
     guid: 'root________',
     title: '',
@@ -140,6 +136,29 @@ function exportFirefoxJson(outputPath: string): void {
     }
   }
 
+  return root;
+}
+
+// CLI entry point
+if (process.argv[1] && process.argv[1].includes('export-firefox-json')) {
+  const args = process.argv.slice(2);
+  let outputPath = './bookmarks-firefox-export.json';
+
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--output' && args[i + 1]) {
+      outputPath = args[i + 1];
+      i++;
+    }
+  }
+
+  if (!fs.existsSync(DATA_PATH)) {
+    console.error('No bookmarks.json found');
+    process.exit(1);
+  }
+
+  const data: BookmarksData = JSON.parse(fs.readFileSync(DATA_PATH, 'utf-8'));
+  const root = toFirefoxJson(data);
+
   const outputDir = path.dirname(outputPath);
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
@@ -148,16 +167,3 @@ function exportFirefoxJson(outputPath: string): void {
   fs.writeFileSync(outputPath, JSON.stringify(root, null, 2), 'utf-8');
   console.log(`Exported ${data.flatBookmarks.length} bookmarks to ${outputPath}`);
 }
-
-// CLI
-const args = process.argv.slice(2);
-let outputPath = './bookmarks-firefox-export.json';
-
-for (let i = 0; i < args.length; i++) {
-  if (args[i] === '--output' && args[i + 1]) {
-    outputPath = args[i + 1];
-    i++;
-  }
-}
-
-exportFirefoxJson(outputPath);

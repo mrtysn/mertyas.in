@@ -15,7 +15,8 @@
     "bookmarks:wayback": "tsx scripts/bookmarks/check-wayback.ts",
     "bookmarks:export": "tsx scripts/bookmarks/export-firefox-json.ts",
     "bookmarks:diff": "tsx scripts/bookmarks/sync-diff.ts",
-    "bookmarks:migrate": "tsx scripts/bookmarks/migrate-v2.ts"
+    "bookmarks:migrate": "tsx scripts/bookmarks/migrate-v2.ts",
+    "bookmarks:admin": "tsx scripts/bookmarks/admin/server.ts"
   },
   "dependencies": {
     "highlight.js": "^11.11.1",
@@ -27,6 +28,7 @@
   "devDependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
     "@eslint/js": "^9.39.2",
+    "@types/express": "^5.0.6",
     "@types/markdown-it": "^14.1.2",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
@@ -36,6 +38,7 @@
     "eslint": "^9.39.2",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.26",
+    "express": "^5.2.1",
     "globals": "^16.5.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",

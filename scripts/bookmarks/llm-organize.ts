@@ -22,26 +22,37 @@ export interface BookmarkSuggestion {
   reasoning: string;
 }
 
-interface OrganizeOptions {
+export interface OrganizeOptions {
   batchSize: number;
   dryRun: boolean;
   folder?: string;
+  apiKey?: string;
+  onProgress?: (event: OrganizeProgress) => void;
+}
+
+export interface OrganizeProgress {
+  type: 'batch' | 'complete' | 'error' | 'info';
+  batch?: number;
+  totalBatches?: number;
+  suggestionsCount?: number;
+  totalSuggestions?: number;
+  message?: string;
 }
 
 /**
  * Send bookmarks to Claude API for organization suggestions.
  */
-async function organizeBookmarks(options: OrganizeOptions): Promise<void> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+export async function organizeBookmarks(options: OrganizeOptions): Promise<BookmarkSuggestion[]> {
+  const apiKey = options.apiKey || process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    console.error('ANTHROPIC_API_KEY environment variable is required');
-    process.exit(1);
+    throw new Error('ANTHROPIC_API_KEY environment variable is required');
   }
 
   if (!fs.existsSync(DATA_PATH)) {
-    console.error('No bookmarks.json found');
-    process.exit(1);
+    throw new Error('No bookmarks.json found');
   }
+
+  const emit = options.onProgress || (() => {});
 
   const data: BookmarksData = JSON.parse(fs.readFileSync(DATA_PATH, 'utf-8'));
   let bookmarks = data.flatBookmarks;
@@ -72,17 +83,20 @@ async function organizeBookmarks(options: OrganizeOptions): Promise<void> {
 
   // Filter out already-processed bookmarks
   bookmarks = bookmarks.filter(b => !processedIds.has(b.id));
-  console.log(`${bookmarks.length} bookmarks to process (${existing.length} already have suggestions)`);
+  emit({ type: 'info', message: `${bookmarks.length} bookmarks to process (${existing.length} already have suggestions)` });
 
   if (bookmarks.length === 0) {
-    console.log('Nothing to do.');
-    return;
+    emit({ type: 'complete', totalSuggestions: existing.length });
+    return existing;
   }
+
+  const totalBatches = Math.ceil(bookmarks.length / options.batchSize);
 
   // Process in batches
   for (let i = 0; i < bookmarks.length; i += options.batchSize) {
     const batch = bookmarks.slice(i, i + options.batchSize);
-    console.log(`\nBatch ${Math.floor(i / options.batchSize) + 1}: processing ${batch.length} bookmarks...`);
+    const batchNum = Math.floor(i / options.batchSize) + 1;
+    emit({ type: 'batch', batch: batchNum, totalBatches, suggestionsCount: allSuggestions.length });
 
     const batchInput = batch.map(b => ({
       id: b.id,
@@ -151,10 +165,10 @@ Only output the JSON array, no other text.`;
         }
       }
 
-      console.log(`  Received ${suggestions.length} suggestions`);
+      emit({ type: 'batch', batch: batchNum, totalBatches, suggestionsCount: allSuggestions.length });
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error);
-      console.error(`  Batch failed: ${msg}`);
+      emit({ type: 'error', message: `Batch ${batchNum} failed: ${msg}` });
     }
   }
 
@@ -166,28 +180,43 @@ Only output the JSON array, no other text.`;
       fs.mkdirSync(CACHE_DIR, { recursive: true });
     }
     fs.writeFileSync(SUGGESTIONS_PATH, JSON.stringify(merged, null, 2), 'utf-8');
-    console.log(`\nSaved ${allSuggestions.length} new suggestions (${merged.length} total) to ${SUGGESTIONS_PATH}`);
+    emit({ type: 'complete', totalSuggestions: merged.length });
+    return merged;
   }
+
+  emit({ type: 'complete', totalSuggestions: existing.length });
+  return [...existing, ...allSuggestions];
 }
 
-// CLI argument parsing
-const args = process.argv.slice(2);
-const options: OrganizeOptions = {
-  batchSize: 50,
-  dryRun: false,
-};
+// CLI entry point
+if (process.argv[1] && process.argv[1].includes('llm-organize')) {
+  const args = process.argv.slice(2);
+  const cliOptions: OrganizeOptions = {
+    batchSize: 50,
+    dryRun: false,
+    onProgress: (e) => {
+      if (e.type === 'info') console.log(e.message);
+      else if (e.type === 'batch') console.log(`Batch ${e.batch}/${e.totalBatches} — ${e.suggestionsCount} suggestions so far`);
+      else if (e.type === 'error') console.error(e.message);
+      else if (e.type === 'complete') console.log(`\nComplete. ${e.totalSuggestions} total suggestions.`);
+    },
+  };
 
-for (let i = 0; i < args.length; i++) {
-  const arg = args[i];
-  if (arg === '--batch-size' && args[i + 1]) {
-    options.batchSize = parseInt(args[i + 1], 10);
-    i++;
-  } else if (arg === '--dry-run') {
-    options.dryRun = true;
-  } else if (arg === '--folder' && args[i + 1]) {
-    options.folder = args[i + 1];
-    i++;
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (arg === '--batch-size' && args[i + 1]) {
+      cliOptions.batchSize = parseInt(args[i + 1], 10);
+      i++;
+    } else if (arg === '--dry-run') {
+      cliOptions.dryRun = true;
+    } else if (arg === '--folder' && args[i + 1]) {
+      cliOptions.folder = args[i + 1];
+      i++;
+    }
   }
-}
 
-organizeBookmarks(options);
+  organizeBookmarks(cliOptions).catch(err => {
+    console.error(err.message);
+    process.exit(1);
+  });
+}
