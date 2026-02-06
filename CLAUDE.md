@@ -49,12 +49,14 @@ pnpm run lint         # Run ESLint
 pnpm run preview      # Preview production build
 pnpm run validate     # Run validation script
 pnpm run import:bookmarks --input <file>  # Import bookmarks (merge-based)
+pnpm run bookmarks:check                  # Check bookmark links (standalone, not in build)
+pnpm run bookmarks:previews               # Fetch OG preview images
 pnpm run bookmarks:organize               # LLM-assisted organization (requires ANTHROPIC_API_KEY)
 pnpm run bookmarks:apply                  # Review/apply LLM suggestions
 pnpm run bookmarks:wayback                # Check Wayback Machine for dead links
 pnpm run bookmarks:export --output <file> # Export to Firefox JSON format
 pnpm run bookmarks:diff --firefox <file>  # Diff local vs Firefox export
-pnpm run bookmarks:migrate                # Migrate data to v2 format
+pnpm run bookmarks:migrate                # Migrate data to current format
 pnpm run bookmarks:admin                  # Launch bookmark admin UI (dev only, port 5175)
 ```
 
@@ -97,7 +99,7 @@ The `build` command runs sequentially:
 
 ## Bookmarks System
 
-Full-featured bookmark management system. Data format is v2.0.0 with merge-based import.
+Full-featured bookmark management system. Data format is v1.1.0 with merge-based import.
 
 **Implemented features:**
 1. **Foundation** — GUID tracking, merge-based import (`--force-replace` for destructive), v2 migration

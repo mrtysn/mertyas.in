@@ -362,6 +362,30 @@
   color: #fff;
 }
 
+/* OG preview image */
+.bookmark-card.has-preview {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.bookmark-card.has-preview > a {
+  align-items: center;
+}
+
+.bookmark-preview {
+  width: 100%;
+  height: 140px;
+  overflow: hidden;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.bookmark-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 /* Bookmark expand / detail view */
 .bookmark-card {
   position: relative;

@@ -2,228 +2,136 @@
 
 > Long-term, incremental project. Each phase delivers standalone value. Break-friendly — resume anytime.
 
-## Current State (Completed)
+## Current State
 
-- Firefox HTML and JSON import (one-way, full replace)
-- 2,553 bookmarks in `src/bookmarks/data/bookmarks.json` (86K lines)
-- Browsable UI: folder navigation, breadcrumbs, search by title/URL/tag, CSS grid, favicons, status badges
-- Link checking via HTTP HEAD (results cached but NOT persisted to bookmarks.json — status badges in UI are non-functional)
-- IDs: `SHA-256(url::title).substring(0,16)` — stable if url+title unchanged
-- Firefox JSON parser reads `guid` but discards it during conversion
+All five phases are implemented. The system is fully functional.
 
-## Phase Dependency Graph
+- **2,553 bookmarks** in `src/bookmarks/data/bookmarks.json`
+- Data format: **v1.1.0** with merge-based import
+- Firefox HTML and JSON import (merge-based, `--force-replace` for destructive)
+- Browsable UI: folder navigation, breadcrumbs, search, CSS grid, favicons, status badges, OG previews
+- Link checking via `pnpm bookmarks:check` (standalone CLI, not part of build)
+- Wayback Machine fallback for dead links
+- OG preview image extraction via `pnpm bookmarks:previews`
+- LLM-assisted organization via Claude API
+- Two-way sync with Firefox via file-based export/import and WebExtension (Manifest V3)
+- Admin UI at `localhost:5175` for visual curation (dev-only)
 
-```
-Phase 1 (Foundation) ──┬──> Phase 2 (Link Health)
-                       ├──> Phase 3 (LLM Organization)
-                       ├──> Phase 5 (Two-Way Sync)
-                       └──> Phase 4 (Enhanced UI) — richer with 2+3 done first
-```
+## Build Pipeline
 
-Phases 2, 3, 5 are independent after Phase 1. Phase 4 benefits from having 2+3 done first but can start anytime.
+The production build (`pnpm run build`) runs:
+1. `tsc -b` — TypeScript compilation
+2. `vite build` — Vite production build
+3. `tsx scripts/generate-feeds.ts` — Generate RSS/Atom feeds
+4. `tsx scripts/bookmarks/build-bookmarks.ts` — Migrate if needed, persist cached link check results, update build metadata
+
+**Link checking and preview fetching are separate CLIs**, not part of the build. This keeps builds fast.
+
+## CLI Commands
+
+| Command | Purpose |
+|---------|---------|
+| `pnpm run build` | Production build (fast, no network) |
+| `pnpm import:bookmarks --input <file>` | Import/merge Firefox bookmarks |
+| `pnpm bookmarks:check` | Check all bookmark links (standalone) |
+| `pnpm bookmarks:previews` | Fetch OG preview images (standalone) |
+| `pnpm bookmarks:wayback` | Check Wayback Machine for dead links |
+| `pnpm bookmarks:organize` | LLM-assisted organization (requires ANTHROPIC_API_KEY) |
+| `pnpm bookmarks:apply` | Review/apply LLM suggestions |
+| `pnpm bookmarks:export --output <file>` | Export to Firefox JSON format |
+| `pnpm bookmarks:diff --firefox <file>` | Diff local vs Firefox export |
+| `pnpm bookmarks:migrate` | Migrate data to current format |
+| `pnpm bookmarks:admin` | Launch admin UI (dev-only, port 5175) |
 
 ---
 
-## Phase 1: Foundation — GUID Tracking + Merge-Based Import
+## Phase 1: Foundation — GUID Tracking + Merge-Based Import [DONE]
 
 **Goal:** Transform the import from "destructive replace" to "intelligent merge." Preserve Firefox GUIDs. Re-imports are additive, not destructive.
 
-**Value:** Re-export from Firefox periodically, re-import, and not lose local enrichments.
+### Data model (v1.1.0)
 
-### Data model changes (`src/utils/types.ts`)
+`Bookmark` type includes: `firefoxGuid`, `source`, `locallyModified`, `archiveUrl`, `previewImage`, `description`.
 
-Add to `Bookmark`:
-- `firefoxGuid?: string` — Firefox's stable GUID
-- `source: 'firefox' | 'manual'` — origin tracking
-- `locallyModified?: boolean` — has user made local edits?
-- `archiveUrl?: string` — for Phase 2, defined now for schema stability
-- `previewImage?: string` — for Phase 2 OG image previews, defined now for schema stability
-- `description?: string` — for Phase 3, defined now for schema stability
+`BookmarksData` includes `syncInfo` with import history.
 
-Add to `BookmarkFolder`:
-- `firefoxGuid?: string`
+### Pipeline
 
-Add `syncInfo` to `BookmarksData`:
-```typescript
-syncInfo: {
-  lastImportSource: string;
-  lastImportDate: number;
-  importHistory: Array<{ date: number; source: string; added: number; updated: number; removed: number; }>;
-}
-```
-
-Bump version to `"2.0.0"`.
-
-### Pipeline changes
-
-| File | Change |
-|------|--------|
-| `scripts/bookmarks/parse-firefox-json.ts` | Propagate `node.guid` → `ParsedNode.firefoxGuid` |
-| `scripts/bookmarks/parse-firefox-html.ts` | Add `firefoxGuid?` to `ParsedNode` interface |
-| `scripts/bookmarks/generate-bookmarks-data.ts` | Carry `firefoxGuid`, `source` through to output |
-| `scripts/bookmarks/build-bookmarks.ts` | Use merge engine when existing data present; add `--force-replace` flag |
-
-### New files
-
-| File | Purpose |
-|------|---------|
-| `scripts/bookmarks/merge-bookmarks.ts` | Match by `firefoxGuid` > `id` > `url`. Update if not locally modified, flag conflicts otherwise. Returns `MergeResult` with counts. |
-| `scripts/bookmarks/migrate-v2.ts` | One-time migration: add `source: 'firefox'`, set version 2.0.0 |
-
-### Verify
-- Import same file twice → 0 added, all unchanged
-- Edit a bookmark locally (`locallyModified: true`), re-import → edit preserved
-- `pnpm run build` succeeds, UI renders
+- `parse-firefox-json.ts` propagates Firefox GUIDs
+- `merge-bookmarks.ts` matches by `firefoxGuid` > `id` > `url`
+- `migrate-v2.ts` handles v1 → v1.1.0 migration
+- `build-bookmarks.ts` uses merge engine when existing data present
 
 ---
 
-## Phase 2: Link Health, Wayback Fallback & OG Image Previews
+## Phase 2: Link Health, Wayback Fallback & OG Previews [DONE]
 
-**Goal:** Dead bookmarks get archive URLs. Status badges become functional. Live bookmarks get preview images via Open Graph metadata.
+**Goal:** Dead bookmarks get archive URLs. Status badges are functional. Live bookmarks get OG preview images.
 
-### Key fix: persist link check results to bookmarks.json
-
-After `check-links.ts` runs, copy `statusCode`/`lastChecked`/`checkError` from cache into the bookmark entries in `bookmarks.json`. This alone makes existing UI status badges work.
-
-### New file: `scripts/bookmarks/check-wayback.ts`
-
-- Wayback API: `https://archive.org/wayback/available?url=<url>`
-- Only check bookmarks where `statusCode >= 400` or `statusCode === 0`
-- Rate limit: 1 req/s (API constraint)
-- Store result in `bookmark.archiveUrl`
-
-### New file: `scripts/bookmarks/fetch-previews.ts`
-
-- For live bookmarks (2xx status), fetch the HTML and extract `og:image` (or `twitter:image`) meta tag
-- Download the image, resize/optimize (sharp or similar), store in `src/bookmarks/data/previews/{id}.webp`
-- Add `previewImage?: string` field to `Bookmark` type (path to preview image)
-- Cache results: only re-fetch if no cached preview or if bookmark URL changed
-- Batch with concurrency limit (10 concurrent), skip if already cached
-- Graceful fallback: if no OG image found, bookmark keeps using favicon/placeholder
-
-### Data model addition (`src/utils/types.ts`)
-
-Add to `Bookmark`:
-- `previewImage?: string` — relative path to OG preview image (e.g., `previews/abc123.webp`)
-
-### UI changes
-
-- `BookmarkCard.tsx`: show preview image above title when available, link to `archiveUrl` for dead bookmarks, show "archived" badge
-- `BookmarksToolbar.tsx`: add status filter (All / Live / Dead / Archived / Unchecked)
-- `bookmarks.css`: `.status-archived` style, preview image styling
-
-### Build pipeline addition
-
-After link checking and Wayback checking, run preview fetching:
-1. Link check → 2. Wayback check (dead links) → 3. OG image fetch (live links) → 4. Persist all results
-
-Add `--skip-previews` flag. Previews are slow on first run but incremental thereafter.
-
-### Verify
-- Build with link checking → `statusCode` in bookmarks.json
-- Dead bookmark → Wayback lookup → `archiveUrl` populated
-- Live bookmark with `og:image` → preview image downloaded, `previewImage` set
-- UI: preview images visible, badges visible, archived links clickable, filter works
-- Bookmark without OG image → graceful fallback to favicon
+- `check-links.ts` — HTTP HEAD checks with cache, standalone CLI with `pnpm bookmarks:check`
+- `check-wayback.ts` — Wayback API fallback for dead links
+- `fetch-previews.ts` — Extract `og:image`/`twitter:image` URLs, store in `bookmark.previewImage`
+- Build pipeline persists cached results into `bookmarks.json` without re-checking
+- `BookmarkCard.tsx` renders preview images, archive links, status badges
 
 ---
 
-## Phase 3: LLM-Assisted Organization
+## Phase 3: LLM-Assisted Organization [DONE]
 
-**Goal:** Better descriptions, tags, and folder placements via Claude API. All suggestions reviewed before applying.
+**Goal:** Better descriptions, tags, and folder placements via Claude API.
 
-### New files
-
-| File | Purpose |
-|------|---------|
-| `scripts/bookmarks/llm-organize.ts` | CLI: batch bookmarks → Claude API → suggestions JSON. Flags: `--batch-size`, `--dry-run`, `--folder` |
-| `scripts/bookmarks/apply-suggestions.ts` | Review + apply: `--interactive` or `--auto-apply-high`. Sets `locallyModified: true`. |
-
-### Approach
-- Group bookmarks by folder, send batches of ~50 to Claude
-- Structured output: `{ suggestedDescription, suggestedTags, suggestedFolderPath, confidence, reasoning }`
-- Suggestions saved to `.cache/llm-suggestions.json` — never auto-applied without review
-- Add `@anthropic-ai/sdk` to devDependencies
-
-### Scripts
-```bash
-pnpm bookmarks:organize [--batch-size 50] [--dry-run] [--folder "Development"]
-pnpm bookmarks:apply [--interactive] [--auto-apply-high]
-```
-
-### Verify
-- `--dry-run` on a small folder → sensible suggestions
-- Apply one suggestion → bookmarks.json updated, `locallyModified: true`
-- Re-import from Firefox → locally modified bookmarks preserved
+- `llm-organize.ts` — Batch bookmarks → Claude API → suggestions JSON
+- `apply-suggestions.ts` — Review + apply with `--interactive` or `--auto-apply-high`
+- Applies description, tags, and folder path changes
+- Rebuilds folder tree after folder path changes
+- Sets `locallyModified: true` on modified bookmarks
 
 ---
 
-## Phase 4: Enhanced UI — Search, Browse, Reference
+## Phase 4: Enhanced UI [DONE]
 
 **Goal:** Make the bookmarks page a genuinely useful public reference.
 
-| Feature | Files | Detail |
-|---------|-------|--------|
-| URL-based folder navigation | `routes.tsx`, `Bookmarks.tsx` | `/bookmarks/Development/React` — shareable URLs via wouter |
-| Sort options | `BookmarksToolbar.tsx`, `Bookmarks.tsx` | Date added, alphabetical, recently checked |
-| Description in search | `Bookmarks.tsx` | Include `description` field in filter |
-| Tag cloud | New: `TagCloud.tsx` | Clickable tag frequencies |
-| Stats dashboard | New: `BookmarksStats.tsx` | Total counts, live/dead/archived, top domains |
-| Expandable detail view | `BookmarkCard.tsx` | Full URL, description, tags, status, archive link, date |
-
-### Verify
-- `/bookmarks/Development/React` → correct folder, shareable URL
-- Sort by date → correct ordering
-- Tag click → filters view
-- Stats accurate
+- URL-based folder navigation (`/bookmarks/Dev/React`)
+- Sort options: date added, alphabetical, recently checked
+- Tag cloud with clickable filtering
+- Stats dashboard (total counts, live/dead/archived, top domains)
+- Expandable detail view per bookmark
+- Status filter (all/live/dead/archived/unchecked)
 
 ---
 
-## Phase 5: Two-Way Sync — Export Back to Firefox
+## Phase 5: Two-Way Sync [DONE]
 
-**Goal:** Changes flow both directions via file-based sync with optional WebExtension.
+**Goal:** Changes flow both directions via file-based sync with WebExtension.
 
-### New files
-
-| File | Purpose |
-|------|---------|
-| `scripts/bookmarks/export-firefox-json.ts` | Convert bookmarks.json → Firefox JSON (preserves GUIDs) |
-| `scripts/bookmarks/sync-diff.ts` | Diff local vs. Firefox export → human-readable report |
-| `extension/` directory | Minimal Firefox WebExtension: Export/Import buttons |
-
-### Workflow
-1. Extension (or manual): Export Firefox bookmarks → JSON
-2. `pnpm import:bookmarks --input ~/Downloads/firefox-export.json` → merge
-3. Make changes (organize, edit, etc.)
-4. `pnpm bookmarks:export --output ~/Downloads/bookmarks-import.json`
-5. Extension (or manual): Import JSON back into Firefox
-
-### Scripts
-```bash
-pnpm bookmarks:export --output <path>
-pnpm bookmarks:diff --firefox <path>
-```
-
-### Verify
-- Export → import into fresh Firefox profile → correct structure
-- Round-trip: Firefox → local → edit → export → Firefox → change reflected
+- `export-firefox-json.ts` — Convert bookmarks.json → Firefox JSON (preserves GUIDs)
+- `sync-diff.ts` — Diff local vs. Firefox export → human-readable report
+- `extension/` — Firefox WebExtension (Manifest V3): Export/Import buttons
 
 ---
 
-## Resumability
+## Phase 6: Admin UI [DONE]
 
-- Every phase commits cleanly; `pnpm run build` always works between phases
-- Each sub-step within a phase is a reasonable commit boundary
-- New fields are all optional — existing UI never breaks mid-work
-- Cache and suggestion files in `.cache/` — gitignored, safe to regenerate
+**Goal:** Browser-based admin for visual curation.
+
+- Express server at `localhost:5175` (dev-only)
+- LLM organize, health checks, sync, direct editing
+- Single HTML file with embedded styles
+- See `docs/bookmarks-admin.md` for details
+
+---
 
 ## Critical Files
 
-| File | Role | Phases |
-|------|------|--------|
-| `src/utils/types.ts` | All type definitions | 1, 2, 3 |
-| `scripts/bookmarks/build-bookmarks.ts` | Build orchestrator | 1, 2 |
-| `scripts/bookmarks/parse-firefox-json.ts` | Firefox GUID propagation | 1 |
-| `scripts/bookmarks/generate-bookmarks-data.ts` | ParsedNode → Bookmark conversion | 1 |
-| `src/bookmarks/BookmarkCard.tsx` | Primary UI component | 2, 4 |
-| `src/bookmarks/Bookmarks.tsx` | Main page component | 4 |
+| File | Role |
+|------|------|
+| `src/utils/types.ts` | All type definitions |
+| `scripts/bookmarks/build-bookmarks.ts` | Build orchestrator (no network calls) |
+| `scripts/bookmarks/check-links.ts` | Standalone link checker CLI |
+| `scripts/bookmarks/fetch-previews.ts` | OG preview image fetcher CLI |
+| `scripts/bookmarks/merge-bookmarks.ts` | Merge engine |
+| `scripts/bookmarks/apply-suggestions.ts` | LLM suggestion applier |
+| `src/bookmarks/BookmarkCard.tsx` | Primary UI component |
+| `src/bookmarks/Bookmarks.tsx` | Main page component |
+| `extension/manifest.json` | WebExtension manifest (V3) |

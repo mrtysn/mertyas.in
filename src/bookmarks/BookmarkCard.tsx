@@ -26,7 +26,12 @@ function BookmarkCard({ bookmark }: BookmarkCardProps) {
   const href = isDead && hasArchive ? bookmark.archiveUrl! : bookmark.url;
 
   return (
-    <article className={`bookmark-card${expanded ? ' expanded' : ''}`}>
+    <article className={`bookmark-card${expanded ? ' expanded' : ''}${bookmark.previewImage ? ' has-preview' : ''}`}>
+      {bookmark.previewImage && (
+        <div className="bookmark-preview">
+          <img src={bookmark.previewImage} alt="" loading="lazy" />
+        </div>
+      )}
       <a href={href} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>
         <div className="bookmark-favicon">
           {bookmark.icon ? (

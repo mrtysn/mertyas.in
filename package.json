@@ -10,6 +10,8 @@
     "preview": "vite preview",
     "validate": "./validate.sh",
     "import:bookmarks": "tsx scripts/bookmarks/build-bookmarks.ts --input",
+    "bookmarks:check": "tsx scripts/bookmarks/check-links.ts",
+    "bookmarks:previews": "tsx scripts/bookmarks/fetch-previews.ts",
     "bookmarks:organize": "tsx scripts/bookmarks/llm-organize.ts",
     "bookmarks:apply": "tsx scripts/bookmarks/apply-suggestions.ts",
     "bookmarks:wayback": "tsx scripts/bookmarks/check-wayback.ts",

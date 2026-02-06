@@ -1,4 +1,11 @@
-import type { Bookmark, BookmarkCache } from '../../src/utils/types.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { loadCache, saveCache } from './utils/cache-manager.js';
+import type { Bookmark, BookmarkCache, BookmarksData } from '../../src/utils/types.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export interface CheckLinksOptions {
   recheckAfterDays: number;
@@ -81,4 +88,46 @@ async function checkLink(bookmark: Bookmark, cache: BookmarkCache): Promise<void
       error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
+}
+
+// Standalone CLI entry point
+if (process.argv[1] && process.argv[1].includes('check-links')) {
+  const DATA_PATH = path.join(__dirname, '../../src/bookmarks/data/bookmarks.json');
+
+  if (!fs.existsSync(DATA_PATH)) {
+    console.error('No bookmarks.json found at', DATA_PATH);
+    process.exit(1);
+  }
+
+  const data: BookmarksData = JSON.parse(fs.readFileSync(DATA_PATH, 'utf-8'));
+  const cache = loadCache();
+
+  console.log(`Checking ${data.flatBookmarks.length} bookmarks...\n`);
+
+  checkLinks(data.flatBookmarks, cache, {
+    recheckAfterDays: 7,
+    maxConcurrent: 10,
+    onProgress: (event) => {
+      if (event.type === 'progress') {
+        process.stdout.write(`\r  Checked ${event.checked}/${event.total}`);
+      } else {
+        console.log(`\n  Done. Checked ${event.checked} links.`);
+      }
+    },
+  }).then(() => {
+    saveCache(cache);
+
+    // Persist results into bookmarks.json
+    for (const bookmark of data.flatBookmarks) {
+      const cached = cache.bookmarks[bookmark.id]?.linkCheck;
+      if (cached) {
+        bookmark.statusCode = cached.statusCode;
+        bookmark.lastChecked = cached.checkedAt;
+        bookmark.checkError = cached.error;
+      }
+    }
+
+    fs.writeFileSync(DATA_PATH, JSON.stringify(data, null, 2), 'utf-8');
+    console.log('Results saved to bookmarks.json');
+  });
 }

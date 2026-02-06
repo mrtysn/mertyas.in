@@ -31,6 +31,7 @@ export interface Bookmark {
   locallyModified?: boolean;
   archiveUrl?: string;
   description?: string;
+  previewImage?: string;
 }
 
 export interface BookmarkFolder {

@@ -2,8 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import readline from 'readline';
-import type { Bookmark, BookmarksData } from '../../src/utils/types.js';
+import type { Bookmark, BookmarkFolder, BookmarksData } from '../../src/utils/types.js';
 import type { BookmarkSuggestion } from './llm-organize.js';
+import { generateFolderId } from './utils/hash-utils.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -81,12 +82,7 @@ async function applySuggestions(options: ApplyOptions): Promise<void> {
   rl?.close();
 
   if (applied > 0) {
-    function syncFolder(folder: typeof data.root): void {
-      folder.bookmarks = folder.bookmarks.map(b => byId.get(b.id) || b);
-      for (const sub of folder.subfolders) syncFolder(sub);
-    }
-    syncFolder(data.root);
-
+    data.root = rebuildFolderTree(data.flatBookmarks);
     fs.writeFileSync(DATA_PATH, JSON.stringify(data, null, 2), 'utf-8');
     console.log(`\nApplied ${applied} suggestions, skipped ${skipped}. Saved.`);
   } else {
@@ -94,9 +90,45 @@ async function applySuggestions(options: ApplyOptions): Promise<void> {
   }
 }
 
+function rebuildFolderTree(bookmarks: Bookmark[]): BookmarkFolder {
+  const root: BookmarkFolder = {
+    id: generateFolderId([]),
+    name: 'Root',
+    path: [],
+    bookmarks: [],
+    subfolders: [],
+  };
+
+  for (const bookmark of bookmarks) {
+    let current = root;
+    for (let i = 0; i < bookmark.folderPath.length; i++) {
+      const segment = bookmark.folderPath[i];
+      let subfolder = current.subfolders.find(f => f.name === segment);
+      if (!subfolder) {
+        const folderPath = bookmark.folderPath.slice(0, i + 1);
+        subfolder = {
+          id: generateFolderId(folderPath),
+          name: segment,
+          path: folderPath,
+          bookmarks: [],
+          subfolders: [],
+        };
+        current.subfolders.push(subfolder);
+      }
+      current = subfolder;
+    }
+    current.bookmarks.push(bookmark);
+  }
+
+  return root;
+}
+
 function applyToBookmark(bookmark: Bookmark, suggestion: BookmarkSuggestion): void {
   bookmark.description = suggestion.suggestedDescription;
   bookmark.tags = suggestion.suggestedTags;
+  if (suggestion.suggestedFolderPath.length > 0) {
+    bookmark.folderPath = suggestion.suggestedFolderPath;
+  }
   bookmark.locallyModified = true;
 }
 

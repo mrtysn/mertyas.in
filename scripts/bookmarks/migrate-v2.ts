@@ -9,11 +9,11 @@ const __dirname = path.dirname(__filename);
 const DATA_PATH = path.join(__dirname, '../../src/bookmarks/data/bookmarks.json');
 
 /**
- * Migrate bookmarks.json from v1.0.0 to v2.0.0.
+ * Migrate bookmarks.json from v1.0.0 to v1.1.0.
  * Adds `source: 'firefox'` to all bookmarks and bumps version.
  */
 export function migrateToV2(data: BookmarksData): BookmarksData {
-  if (data.version === '2.0.0') {
+  if (data.version === '1.1.0') {
     return data;
   }
 
@@ -41,7 +41,7 @@ export function migrateToV2(data: BookmarksData): BookmarksData {
   }
   migrateFolderBookmarks(data.root);
 
-  data.version = '2.0.0';
+  data.version = '1.1.0';
 
   if (!data.syncInfo) {
     data.syncInfo = {

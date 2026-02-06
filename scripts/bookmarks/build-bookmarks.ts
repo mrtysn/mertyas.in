@@ -6,8 +6,7 @@ import { parseFirefoxJson } from './parse-firefox-json.js';
 import { generateBookmarksData, writeBookmarksData } from './generate-bookmarks-data.js';
 import { mergeBookmarks } from './merge-bookmarks.js';
 import { migrateToV2 } from './migrate-v2.js';
-import { checkLinks } from './check-links.js';
-import { loadCache, saveCache } from './utils/cache-manager.js';
+import { loadCache } from './utils/cache-manager.js';
 import type { BookmarksData } from '../../src/utils/types.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -17,7 +16,6 @@ const DATA_PATH = path.join(__dirname, '../../src/bookmarks/data/bookmarks.json'
 
 interface BuildOptions {
   input?: string;
-  skipLinkCheck?: boolean;
   forceReplace?: boolean;
 }
 
@@ -86,18 +84,7 @@ async function buildBookmarks(options: BuildOptions = {}): Promise<void> {
     // 3. Load cache
     const cache = loadCache();
 
-    // 4. Check links
-    if (!options.skipLinkCheck) {
-      await checkLinks(bookmarksData.flatBookmarks, cache, {
-        recheckAfterDays: 7,
-        maxConcurrent: 10,
-      });
-      saveCache(cache);
-    } else {
-      console.log('Skipping link checking');
-    }
-
-    // 5. Persist link check results from cache into bookmarks
+    // 4. Persist link check results from cache into bookmarks
     for (const bookmark of bookmarksData.flatBookmarks) {
       const cached = cache.bookmarks[bookmark.id]?.linkCheck;
       if (cached) {
@@ -107,7 +94,7 @@ async function buildBookmarks(options: BuildOptions = {}): Promise<void> {
       }
     }
 
-    // Also update bookmarks within the folder tree
+    // 5. Sync folder tree with updated flat bookmarks
     const byId = new Map(bookmarksData.flatBookmarks.map(b => [b.id, b]));
     function syncFolderBookmarks(folder: typeof bookmarksData.root): void {
       folder.bookmarks = folder.bookmarks.map(b => byId.get(b.id) || b);
@@ -145,8 +132,6 @@ for (let i = 0; i < args.length; i++) {
   if (arg === '--input' && args[i + 1]) {
     options.input = args[i + 1];
     i++;
-  } else if (arg === '--skip-link-check') {
-    options.skipLinkCheck = true;
   } else if (arg === '--force-replace') {
     options.forceReplace = true;
   } else if (arg.startsWith('--')) {
