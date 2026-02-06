@@ -1,10 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
-DRY_RUN=false
+TEST_MODE=false
 for arg in "$@"; do
     case "$arg" in
-        --dry-run) DRY_RUN=true ;;
+        --test) TEST_MODE=true ;;
     esac
 done
 
@@ -140,11 +140,23 @@ $API_REF"
 
 # 4. Launch Claude Code
 cd "$PROJECT_ROOT"
-if [ "$DRY_RUN" = true ]; then
-    echo "=== DRY RUN ==="
+if [ "$TEST_MODE" = true ]; then
+    echo "=== TEST MODE ==="
     echo "System prompt length: ${#SYSTEM_PROMPT} chars"
+    echo "Running non-interactive Claude session against stats API..."
     echo ""
-    echo "$SYSTEM_PROMPT"
+    if OUTPUT=$(claude -p "Report the current bookmark stats by calling the stats API endpoint." \
+        --append-system-prompt "$SYSTEM_PROMPT" \
+        --allowedTools "Bash(curl:*)" 2>&1); then
+        echo "$OUTPUT"
+        echo ""
+        echo "=== PASS ==="
+    else
+        echo "$OUTPUT" >&2
+        echo ""
+        echo "=== FAIL ===" >&2
+        exit 1
+    fi
     exit 0
 fi
 exec claude --append-system-prompt "$SYSTEM_PROMPT"
