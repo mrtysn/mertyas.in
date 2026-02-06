@@ -58,6 +58,7 @@ pnpm run bookmarks:export --output <file> # Export to Firefox JSON format
 pnpm run bookmarks:diff --firefox <file>  # Diff local vs Firefox export
 pnpm run bookmarks:migrate                # Migrate data to current format
 pnpm run bookmarks:admin                  # Launch bookmark admin UI (dev only, port 5175)
+pnpm run bookmarks:curate                 # Interactive Claude Code session for bookmark curation
 ```
 
 ## Project Structure

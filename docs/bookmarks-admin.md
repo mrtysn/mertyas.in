@@ -80,3 +80,20 @@ The server is a thin HTTP layer over the same functions the CLI scripts use. The
 | POST | `/api/diff` | Diff against Firefox export |
 
 SSE endpoints return `Content-Type: text/event-stream` with `progress`, `complete`, and `error` events.
+
+## Claude Code Session
+
+An interactive Claude Code session that acts as a smart client of the admin API. Launched via:
+
+```bash
+pnpm bookmarks:curate
+```
+
+The script:
+1. Starts the admin server in background if not already running
+2. Gathers current state (stats, suggestion count, folder list) via the API
+3. Launches `claude --append-system-prompt` with the full API reference and workflow guidance
+
+Within the session, Claude Code can check stats, trigger LLM organize, review and accept/reject suggestions, run health checks, and edit bookmarks — all via curl against the same Express server the browser UI uses. Both are peer consumers of the same backend.
+
+Requires `ANTHROPIC_API_KEY` in the environment for LLM organize operations.

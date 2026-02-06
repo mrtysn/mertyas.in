@@ -18,7 +18,8 @@
     "bookmarks:export": "tsx scripts/bookmarks/export-firefox-json.ts",
     "bookmarks:diff": "tsx scripts/bookmarks/sync-diff.ts",
     "bookmarks:migrate": "tsx scripts/bookmarks/migrate-v2.ts",
-    "bookmarks:admin": "tsx scripts/bookmarks/admin/server.ts"
+    "bookmarks:admin": "tsx scripts/bookmarks/admin/server.ts",
+    "bookmarks:curate": "./scripts/bookmarks/curate"
   },
   "dependencies": {
     "highlight.js": "^11.11.1",

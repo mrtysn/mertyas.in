@@ -1,0 +1,150 @@
+#!/bin/bash
+set -euo pipefail
+
+DRY_RUN=false
+for arg in "$@"; do
+    case "$arg" in
+        --dry-run) DRY_RUN=true ;;
+    esac
+done
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+API="http://localhost:5175"
+ADMIN_PID=""
+
+cleanup() {
+    if [ -n "$ADMIN_PID" ]; then
+        echo "Stopping admin server (PID $ADMIN_PID)..."
+        kill "$ADMIN_PID" 2>/dev/null || true
+    fi
+}
+trap cleanup EXIT
+
+# 1. Ensure admin server is running
+if ! curl -sf "$API/api/stats" > /dev/null 2>&1; then
+    echo "Starting bookmarks admin server..."
+    cd "$PROJECT_ROOT" && pnpm bookmarks:admin &
+    ADMIN_PID=$!
+    # Wait for server to be ready (up to 10s)
+    for i in $(seq 1 20); do
+        if curl -sf "$API/api/stats" > /dev/null 2>&1; then
+            break
+        fi
+        if [ "$i" -eq 20 ]; then
+            echo "Failed to start admin server" >&2
+            exit 1
+        fi
+        sleep 0.5
+    done
+    echo "Admin server running (PID $ADMIN_PID)"
+else
+    echo "Admin server already running at $API"
+fi
+
+# 2. Gather current state
+STATS=$(curl -sf "$API/api/stats")
+SUGGESTION_COUNT=$(curl -sf "$API/api/suggestions" | python3 -c "import sys,json; print(len(json.load(sys.stdin)))")
+FOLDERS=$(curl -sf "$API/api/folders" | python3 -c "
+import sys, json
+folders = json.load(sys.stdin)
+for f in folders[:30]:
+    print(f'  - {f}')
+")
+
+# 3. Build system prompt
+read -r -d '' SYSTEM_PROMPT << 'PROMPT_END' || true
+You are curating a bookmark collection via the admin API at localhost:5175.
+
+The admin server is already running. Both you and the browser UI at localhost:5175 are peer consumers of the same Express server — changes you make via the API are immediately visible in the browser, and vice versa.
+
+## Current State
+PROMPT_END
+
+# Append dynamic context
+SYSTEM_PROMPT="$SYSTEM_PROMPT
+\`\`\`json
+$STATS
+\`\`\`
+Pending LLM suggestions: $SUGGESTION_COUNT
+Folders:
+$FOLDERS
+
+## ANTHROPIC_API_KEY"
+
+if [ -n "${ANTHROPIC_API_KEY:-}" ]; then
+    SYSTEM_PROMPT="$SYSTEM_PROMPT
+The key is available in your environment. When calling /api/organize, include it in the POST body:
+\`\`\`
+curl -N -X POST -H 'Content-Type: application/json' -d '{\"apiKey\":\"'\$ANTHROPIC_API_KEY'\",\"batchSize\":50}' $API/api/organize
+\`\`\`"
+else
+    SYSTEM_PROMPT="$SYSTEM_PROMPT
+No ANTHROPIC_API_KEY found in environment. To use LLM organize, either:
+- Set it before launching: \`ANTHROPIC_API_KEY=sk-... pnpm bookmarks:curate\`
+- Or enter it manually in the organize POST body"
+fi
+
+read -r -d '' API_REF << 'API_END' || true
+
+## API Reference
+
+All endpoints are at localhost:5175. Use curl from your Bash tool.
+
+| Endpoint | Method | Example |
+|----------|--------|---------|
+| `/api/stats` | GET | `curl -s localhost:5175/api/stats` |
+| `/api/bookmarks` | GET | `curl -s localhost:5175/api/bookmarks \| jq length` (large — filter with jq) |
+| `/api/suggestions` | GET | `curl -s localhost:5175/api/suggestions` |
+| `/api/folders` | GET | `curl -s localhost:5175/api/folders` |
+| `/api/organize` | POST | `curl -N -X POST -H 'Content-Type: application/json' -d '{"batchSize":50}' localhost:5175/api/organize` |
+| `/api/suggestion/:id/accept` | POST | `curl -X POST -H 'Content-Type: application/json' -d '{}' localhost:5175/api/suggestion/ID/accept` |
+| `/api/suggestion/:id/reject` | POST | `curl -X POST localhost:5175/api/suggestion/ID/reject` |
+| `/api/suggestions/accept-high` | POST | `curl -X POST localhost:5175/api/suggestions/accept-high` |
+| `/api/bookmark/:id` | POST | `curl -X POST -H 'Content-Type: application/json' -d '{"tags":["a","b"]}' localhost:5175/api/bookmark/ID` |
+| `/api/bookmark/:id` | DELETE | `curl -X DELETE localhost:5175/api/bookmark/ID` |
+| `/api/link-check` | POST | `curl -N -X POST localhost:5175/api/link-check` |
+| `/api/wayback` | POST | `curl -N -X POST localhost:5175/api/wayback` |
+
+### SSE Endpoints
+
+`/api/organize`, `/api/link-check`, and `/api/wayback` return Server-Sent Event streams.
+Use `curl -N` (no-buffer) to stream them. Events:
+- `progress` — incremental status updates (JSON data)
+- `complete` — operation finished (JSON data with summary)
+- `error` — something went wrong
+
+### Editing Bookmarks
+
+POST `/api/bookmark/:id` accepts any combination of: `title`, `description`, `tags` (array), `folder` (string path like "Dev/React").
+
+### Suggestion Fields
+
+Each suggestion from GET `/api/suggestions` has: `id`, `bookmarkId`, `confidence` ("high"/"medium"/"low"), and proposed changes (`description`, `tags`, `folder`). Review the diff between current and suggested values before accepting.
+
+## Workflow Guidance
+
+Suggested order of operations:
+1. **Check stats** — `GET /api/stats` to see overall health
+2. **Review pending suggestions** — `GET /api/suggestions` to see what the LLM has proposed
+3. **Accept/reject suggestions** — Review individually or bulk-accept high-confidence
+4. **Organize new batches** — `POST /api/organize` to generate more suggestions
+5. **Health check** — `POST /api/link-check` then `POST /api/wayback` for dead links
+6. **Manual edits** — Fix titles, tags, folders as needed via `POST /api/bookmark/:id`
+
+Use your judgement. Ask the user what they want to focus on.
+API_END
+
+SYSTEM_PROMPT="$SYSTEM_PROMPT
+$API_REF"
+
+# 4. Launch Claude Code
+cd "$PROJECT_ROOT"
+if [ "$DRY_RUN" = true ]; then
+    echo "=== DRY RUN ==="
+    echo "System prompt length: ${#SYSTEM_PROMPT} chars"
+    echo ""
+    echo "$SYSTEM_PROMPT"
+    exit 0
+fi
+exec claude --append-system-prompt "$SYSTEM_PROMPT"
