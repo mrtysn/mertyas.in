@@ -1,62 +1,59 @@
-type Category = "Active Projects" | "Tools" | "Games" | "Archive";
-
 interface Project {
   name: string;
   icon: string;
+  desc: string;
   link?: string;
-  category: Category;
+  archived?: boolean;
 }
 
 const projects: Project[] = [
-  // Active Projects
-  { name: "mertyas.in", icon: "🌐", link: "https://github.com/mrtysn/mertyas.in", category: "Active Projects" },
-  { name: "cv", icon: "📄", link: "https://github.com/mrtysn/cv", category: "Active Projects" },
-  { name: "dev-env", icon: "🔧", link: "https://github.com/mrtysn/dev-env", category: "Active Projects" },
-  { name: "agents-shared", icon: "🤖", link: "https://github.com/mrtysn/agents-shared", category: "Active Projects" },
-  { name: "aw-cli", icon: "⚡", link: "https://github.com/mrtysn/aw-cli", category: "Active Projects" },
-
-  // Tools
-  { name: "toolbelt", icon: "🧰", link: "https://github.com/mrtysn/toolbelt", category: "Tools" },
-  { name: "peek", icon: "👁", link: "https://github.com/mrtysn/peek", category: "Tools" },
-  { name: "blame-session", icon: "🔍", category: "Tools" },
-  { name: "make-icon", icon: "🎨", link: "https://github.com/mrtysn/make-icon", category: "Tools" },
-  { name: "teleport", icon: "🚀", link: "https://github.com/mrtysn/teleport", category: "Tools" },
-  { name: "tgo", icon: "📟", category: "Tools" },
-  { name: "tmux-start", icon: "🖥", category: "Tools" },
-  { name: "aw", icon: "🐝", category: "Tools" },
-  { name: "pull_of_wonders", icon: "🎩", category: "Tools" },
-  { name: "peon-ping", icon: "🔔", link: "https://github.com/mrtysn/peon-ping", category: "Tools" },
-  { name: "app-toggle", icon: "🔀", link: "https://github.com/mrtysn/app-toggle", category: "Tools" },
-
-  // Games
-  { name: "oj", icon: "🎮", category: "Games" },
-  { name: "moji", icon: "😎", category: "Games" },
-
-  // Archive
-  { name: "instagram-extension", icon: "📷", link: "https://github.com/mrtysn/instagram-extension", category: "Archive" },
-  { name: "lstm", icon: "🧠", link: "https://github.com/mrtysn/lstm", category: "Archive" },
-  { name: "splendor-clone", icon: "♠️", link: "https://github.com/mrtysn/splendor-clone", category: "Archive" },
-  { name: "ransomware-mars", icon: "🔓", link: "https://github.com/mrtysn/ransomware-mars", category: "Archive" },
-  { name: "intern-case-study", icon: "📋", link: "https://github.com/mrtysn/intern-case-study", category: "Archive" },
-  { name: "mahalle-baskisi", icon: "📁", category: "Archive" },
-  { name: "mrtysn.github.io", icon: "📁", link: "https://github.com/mrtysn/mrtysn.github.io", category: "Archive" },
-  { name: "draw-svg", icon: "📁", category: "Archive" },
-  { name: "eeg", icon: "📁", category: "Archive" },
-  { name: "todo", icon: "📁", category: "Archive" },
+  { name: "mertyas.in", icon: "🌐", desc: "This website — React, Classless.css, Vite", link: "https://github.com/mrtysn/mertyas.in" },
+  { name: "aw-cli", icon: "⚡", desc: "Multi-agent Claude Code workflow coordinator", link: "https://github.com/mrtysn/aw-cli" },
+  { name: "agents-shared", icon: "🤖", desc: "Shared Claude Code commands and skills via submodule", link: "https://github.com/mrtysn/agents-shared" },
+  { name: "toolbelt", icon: "🧰", desc: "CLI dashboard for custom scripts and apps", link: "https://github.com/mrtysn/toolbelt" },
+  { name: "peek", icon: "👁", desc: "Screenshot + local LLM analysis wrapper", link: "https://github.com/mrtysn/peek" },
+  { name: "teleport", icon: "🚀", desc: "Push local changes to remote WIP branches", link: "https://github.com/mrtysn/teleport" },
+  { name: "make-icon", icon: "🎨", desc: "Generate .icns app icons from SF Symbols", link: "https://github.com/mrtysn/make-icon" },
+  { name: "dev-env", icon: "🔧", desc: "Machine bootstrap and dotfiles", link: "https://github.com/mrtysn/dev-env" },
+  { name: "cv", icon: "📄", desc: "Online CV — React, Semantic UI", link: "https://github.com/mrtysn/cv" },
+  { name: "app-toggle", icon: "🔀", desc: "Batch open/close communication apps", link: "https://github.com/mrtysn/app-toggle" },
+  { name: "peon-ping", icon: "🔔", desc: "Notification relay service", link: "https://github.com/mrtysn/peon-ping" },
+  { name: "instagram-extension", icon: "📷", desc: "Browser extension for Instagram utilities", link: "https://github.com/mrtysn/instagram-extension" },
+  { name: "oj", icon: "🎮", desc: "Mobile game framework in Godot 4.4" },
+  { name: "moji", icon: "😎", desc: "Emoji-based mobile game in Godot 3.x" },
+  { name: "blame-session", icon: "🔍", desc: "Git blame session analyzer" },
+  { name: "tgo", icon: "📟", desc: "Terminal-based Go board" },
+  { name: "tmux-start", icon: "🖥", desc: "Tmux session bootstrapper" },
+  { name: "aw", icon: "🐝", desc: "ActivityWatch CLI for time tracking" },
+  { name: "pull_of_wonders", icon: "🎩", desc: "Random useful script collection" },
+  { name: "lstm", icon: "🧠", desc: "LSTM neural network experiments", link: "https://github.com/mrtysn/lstm" },
+  { name: "splendor-clone", icon: "♠️", desc: "Digital board game clone", link: "https://github.com/mrtysn/splendor-clone" },
+  { name: "ransomware-mars", icon: "🔓", desc: "Security research — ransomware analysis", link: "https://github.com/mrtysn/ransomware-mars" },
+  { name: "intern-case-study", icon: "📋", desc: "Technical case study for interns", link: "https://github.com/mrtysn/intern-case-study" },
+  { name: "mahalle-baskisi", icon: "🏘", desc: "Social pressure simulation", archived: true },
+  { name: "mrtysn.github.io", icon: "📁", desc: "Legacy GitHub Pages site", link: "https://github.com/mrtysn/mrtysn.github.io", archived: true },
+  { name: "draw-svg", icon: "✏️", desc: "SVG drawing experiments", archived: true },
+  { name: "eeg", icon: "🧪", desc: "EEG signal processing research", archived: true },
+  { name: "todo", icon: "✅", desc: "Task management prototype", archived: true },
 ];
 
-const categories: Category[] = ["Active Projects", "Tools", "Games", "Archive"];
+function Card({ project }: { project: Project }) {
+  const classes = ["project-card", project.archived && "archived", project.link && "linked"]
+    .filter(Boolean)
+    .join(" ");
 
-function Tile({ project }: { project: Project }) {
   const content = (
     <>
-      <span className="tile-icon">{project.icon}</span>
-      <span className="tile-name">{project.name}</span>
+      <span className="card-icon">{project.icon}</span>
+      <span className="card-body">
+        <span className="card-name">{project.name}</span>
+        <span className="card-desc">{project.desc}</span>
+      </span>
     </>
   );
 
   return (
-    <div className="project-tile">
+    <div className={classes}>
       {project.link ? (
         <a href={project.link} target="_blank" rel="noopener noreferrer">
           {content}
@@ -72,18 +69,11 @@ function Projects() {
   return (
     <div>
       <h2>Projects</h2>
-      {categories.map((category) => (
-        <section key={category}>
-          <h3>{category}</h3>
-          <div className="projects-grid">
-            {projects
-              .filter((p) => p.category === category)
-              .map((project) => (
-                <Tile key={project.name} project={project} />
-              ))}
-          </div>
-        </section>
-      ))}
+      <div className="projects-grid">
+        {projects.map((project) => (
+          <Card key={project.name} project={project} />
+        ))}
+      </div>
     </div>
   );
 }

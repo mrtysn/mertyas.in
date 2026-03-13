@@ -98,6 +98,19 @@ The `build` command runs sequentially:
 - Functional React components with hooks
 - ESLint for linting
 
+## Visual Design Rules
+
+These rules protect the hand-crafted aesthetic of this site. Follow them when modifying any UI component.
+
+1. **No decoration without information.** Every visual element must communicate something. A border means "this is public." Opacity means "this is archived." Nothing is ornamental.
+2. **Typography carries the hierarchy.** Size, weight, and color do the work — not backgrounds, gradients, or icons. Headings, names, and descriptions each have a distinct role.
+3. **Use the palette, don't extend it.** All colors come from classless.css CSS variables (`--cfg`, `--cbg`, `--cmed`, `--clink`, `--cemph`, `--cdark`, `--clight`). No hex literals in custom.css.
+4. **Interactions are subtle and fast.** Transitions under 200ms. No scale transforms above 1.02. No color changes outside the variable set.
+5. **Semantic HTML first.** Lean on what classless.css styles for free. Add classes only when semantic elements aren't sufficient.
+6. **No generic placeholders.** Every project gets a distinct icon and a one-line description. If it can't be described in one line, reconsider whether it belongs on the page.
+7. **Archived items are present but quiet.** Reduced opacity, no accent, no link styling. They exist for completeness, not prominence.
+8. **No LLM bloat.** Do not add wrapper divs, utility classes, or abstractions that exist only for "flexibility." If a pattern is used once, inline it.
+
 ## Bookmarks System
 
 Full-featured bookmark management system. Data format is v1.1.0 with merge-based import.

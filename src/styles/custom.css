@@ -35,43 +35,68 @@ article code {
 /* Projects grid */
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.5rem;
   margin-bottom: 2rem;
 }
 
-.project-tile {
+.project-card {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 1rem 0.5rem;
-  border-radius: 8px;
-  background: var(--cmed, #2a2a2a);
-  text-align: center;
-  min-height: 100px;
-  transition: background 0.15s;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  border-left: 3px solid transparent;
+  transition: background 0.15s, transform 0.15s;
 }
 
-.project-tile:hover {
-  background: var(--cfg, #3a3a3a);
+.project-card.linked {
+  border-left-color: var(--cemph);
 }
 
-.project-tile a {
+.project-card:hover {
+  background: var(--clight);
+  transform: translateY(-1px);
+}
+
+.project-card.archived {
+  opacity: 0.5;
+}
+
+.project-card.archived:hover {
+  opacity: 0.7;
+}
+
+.project-card a {
   text-decoration: none;
   color: inherit;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  width: 100%;
 }
 
-.project-tile .tile-icon {
-  font-size: 2rem;
+.card-icon {
+  font-size: 1.5rem;
   line-height: 1;
+  flex-shrink: 0;
+  width: 2rem;
+  text-align: center;
 }
 
-.project-tile .tile-name {
-  font-size: 0.8rem;
-  word-break: break-word;
+.card-body {
+  display: flex;
+  flex-direction: column;
+  margin-left: 0.75rem;
+  min-width: 0;
+}
+
+.card-name {
+  font-weight: 400;
+  font-size: 0.9rem;
+  color: var(--cfg);
+}
+
+.card-desc {
+  font-size: 0.75rem;
+  color: var(--cdark);
+  line-height: 1.4;
 }
