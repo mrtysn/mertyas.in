@@ -31,3 +31,47 @@ article code {
   padding: 0.2em 0.4em;
   border-radius: 3px;
 }
+
+/* Projects grid */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.project-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0.5rem;
+  border-radius: 8px;
+  background: var(--cmed, #2a2a2a);
+  text-align: center;
+  min-height: 100px;
+  transition: background 0.15s;
+}
+
+.project-tile:hover {
+  background: var(--cfg, #3a3a3a);
+}
+
+.project-tile a {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.project-tile .tile-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.project-tile .tile-name {
+  font-size: 0.8rem;
+  word-break: break-word;
+}
