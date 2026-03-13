@@ -17,7 +17,6 @@ const projects: Project[] = [
 
   // Tools
   { name: "toolbelt", icon: "🧰", link: "https://github.com/mrtysn/toolbelt", category: "Tools" },
-  { name: "toolbelt-widget", icon: "📊", category: "Tools" },
   { name: "peek", icon: "👁", link: "https://github.com/mrtysn/peek", category: "Tools" },
   { name: "blame-session", icon: "🔍", category: "Tools" },
   { name: "make-icon", icon: "🎨", link: "https://github.com/mrtysn/make-icon", category: "Tools" },
