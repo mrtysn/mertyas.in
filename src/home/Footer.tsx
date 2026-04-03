@@ -15,6 +15,7 @@ function Footer() {
           <Outlink text="source" link="https://github.com/mrtysn/mertyas.in" />
         </small>
       </div>
+      {/* Future idea: "Follow me on [icon] [icon] or get in touch on [icon]" footer — pick from About links */}
     </footer>
   );
 }
