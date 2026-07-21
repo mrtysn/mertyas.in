@@ -31,3 +31,6 @@ repomix-output.txt
 
 # bookmarks build cache
 src/bookmarks/data/.cache/
+
+# machine-local: skills this repo opts out of (see .agents/scripts/init.sh)
+.agents-ignore
