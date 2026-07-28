@@ -2,8 +2,8 @@ import { md } from './markdown';
 import { Post } from './types';
 import { parseFrontmatter } from './frontmatter';
 
-// Vite's glob import - loads all .md files at build time
-const postFiles = import.meta.glob<string>('../posts/*.md', {
+// Vite's glob import - loads all .md and .html files at build time
+const postFiles = import.meta.glob<string>('../posts/*.{md,html}', {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -14,17 +14,19 @@ export function getAllPosts(): Post[] {
     // Extract filename and check if it has date prefix
     const filename = filepath.split('/').pop()!;
     const hasDatePrefix = /^\d{4}-\d{2}-\d{2}-/.test(filename);
+    const format = filename.endsWith('.html') ? ('html' as const) : ('md' as const);
 
     // Extract slug: "2024-12-25-thirty.md" -> "thirty" or "debug.md" -> "debug"
-    const slug = filename.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/\.md$/, '');
+    const slug = filename.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/\.(md|html)$/, '');
 
-    const { frontmatter, content: markdownContent } = parseFrontmatter(content);
+    const { frontmatter, content: body } = parseFrontmatter(content);
 
     return {
       slug,
       frontmatter,
-      content: markdownContent,
-      html: md.render(markdownContent),
+      content: body,
+      html: format === 'html' ? body : md.render(body),
+      format,
       hasDatePrefix,
     };
   });

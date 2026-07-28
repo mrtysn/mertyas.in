@@ -15,8 +15,8 @@ const __dirname = path.dirname(__filename);
 export function loadPosts(includeDrafts = false, limit?: number): Post[] {
   const postsDir = path.join(__dirname, '../src/posts');
 
-  // Read all .md files from posts directory
-  const files = fs.readdirSync(postsDir).filter((file) => file.endsWith('.md'));
+  // Read all .md and .html files from posts directory
+  const files = fs.readdirSync(postsDir).filter((file) => /\.(md|html)$/.test(file));
 
   const posts: Post[] = files
     .filter((filename) => {
@@ -27,20 +27,22 @@ export function loadPosts(includeDrafts = false, limit?: number): Post[] {
       const filepath = path.join(postsDir, filename);
       const content = fs.readFileSync(filepath, 'utf-8');
 
-      // Extract slug from filename (remove date prefix and .md extension)
-      const slug = filename.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/\.md$/, '');
+      // Extract slug from filename (remove date prefix and extension)
+      const slug = filename.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/\.(md|html)$/, '');
+      const format = filename.endsWith('.html') ? ('html' as const) : ('md' as const);
 
       // Parse frontmatter and content
       const { frontmatter, content: markdownContent } = parseFrontmatter(content);
 
-      // Render markdown to HTML
-      const html = md.render(markdownContent);
+      // Render markdown to HTML; HTML posts are already HTML
+      const html = format === 'html' ? markdownContent : md.render(markdownContent);
 
       return {
         slug,
         frontmatter,
         content: markdownContent,
         html,
+        format,
       };
     });
 

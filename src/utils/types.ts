@@ -12,6 +12,7 @@ export interface Post {
   frontmatter: PostFrontmatter;
   content: string;
   html: string;
+  format: 'md' | 'html';
 }
 
 export interface Bookmark {

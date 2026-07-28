@@ -13,9 +13,15 @@ function Posts() {
         <ul>
           {posts.map((post) => (
             <li key={post.slug}>
-              <Link href={`/${post.slug}`}>
-                <strong>{post.frontmatter.title}</strong>
-              </Link>
+              {post.format === 'html' ? (
+                <a href={`/${post.slug}`}>
+                  <strong>{post.frontmatter.title}</strong>
+                </a>
+              ) : (
+                <Link href={`/${post.slug}`}>
+                  <strong>{post.frontmatter.title}</strong>
+                </Link>
+              )}
               <br />
               <small>
                 {post.frontmatter.date ? `${post.frontmatter.date} - ` : ''}

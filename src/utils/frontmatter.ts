@@ -4,6 +4,13 @@ export function parseFrontmatter(content: string): {
   frontmatter: PostFrontmatter;
   content: string;
 } {
+  // HTML posts wrap the frontmatter block in a leading comment; unwrap it
+  const htmlCommentRegex = /^<!--\s*\n(---\s*\n[\s\S]*?\n---)\s*\n-->\s*\n([\s\S]*)$/;
+  const htmlMatch = content.match(htmlCommentRegex);
+  if (htmlMatch) {
+    content = `${htmlMatch[1]}\n${htmlMatch[2]}`;
+  }
+
   const frontmatterRegex = /^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/;
   const match = content.match(frontmatterRegex);
 
