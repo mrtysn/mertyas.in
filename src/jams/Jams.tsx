@@ -11,6 +11,15 @@ import {
 
 const CHECKS_KEY = "jams:checks";
 
+/**
+ * Deadlines render in a fixed zone rather than the browser's.
+ * Firefox with `privacy.resistFingerprinting` reports UTC, which silently
+ * showed every deadline three hours early — a jam page that lies about when a
+ * jam closes is worse than useless.
+ */
+const TZ = "Europe/Istanbul";
+const TZ_LABEL = "Istanbul time";
+
 const AI_LABEL: Record<AiPolicy, string> = {
   banned: "AI assets banned",
   assist: "AI as assist only",
@@ -27,11 +36,13 @@ function loadChecks(): Record<string, boolean> {
 }
 
 function fmt(iso: string): string {
-  return new Date(iso).toLocaleString(undefined, {
+  return new Date(iso).toLocaleString("en-GB", {
     day: "numeric",
     month: "short",
     hour: "2-digit",
     minute: "2-digit",
+    hour12: false,
+    timeZone: TZ,
   });
 }
 
@@ -41,7 +52,7 @@ function fmt(iso: string): string {
  * 15 Aug 23:59Z onto the 16th.
  */
 function fmtDay(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, {
+  return new Date(iso).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
     timeZone: "UTC",
@@ -159,7 +170,7 @@ function Jams() {
           <tr>
             <th>Jam</th>
             <th>Build</th>
-            <th>Deadline</th>
+            <th>Deadline ({TZ_LABEL})</th>
           </tr>
         </thead>
         <tbody>
@@ -178,8 +189,10 @@ function Jams() {
       </table>
 
       <p className="jams-intro">
-        Windows are read off each jam page and stored in UTC; times are shown in
-        your local zone. Checklists live in this browser.
+        Windows are read off each jam page and stored in UTC. Every time on this
+        page is shown in {TZ_LABEL} on a 24-hour clock, not in your browser's
+        zone — Firefox with fingerprint resistance reports UTC and would show
+        every deadline three hours early. Checklists live in this browser.
       </p>
 
       <div className="jams-next">
