@@ -35,11 +35,16 @@ function fmt(iso: string): string {
   });
 }
 
-/** Sprint bounds are day-granular; showing a 03:00 start would be noise. */
+/**
+ * Sprint bounds are day-granular, so they render in UTC — the zone they were
+ * written in. Converting to local time would slide a sprint stored as
+ * 15 Aug 23:59Z onto the 16th.
+ */
 function fmtDay(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, {
     day: "numeric",
     month: "short",
+    timeZone: "UTC",
   });
 }
 
@@ -86,13 +91,66 @@ function Jams() {
 
   const sprints = SPRINTS.filter((s) => active && s.jams.includes(active.key));
 
+  // Dates only — the one part of this page that stays true.
+  const schedule = useMemo(
+    () =>
+      [...JAMS]
+        .sort((a, b) => Date.parse(a.end) - Date.parse(b.end))
+        .map((jam) => {
+          // Brackeys has two sprints — prep and build. Span the lot, or the
+          // table reports the prep window as if it were the whole effort.
+          const own = SPRINTS.filter((s) => s.jams.includes(jam.key));
+          const first = own[0];
+          const last = own[own.length - 1];
+          return {
+            key: jam.key,
+            name: jam.name,
+            end: jam.end,
+            build: first ? `${fmtDay(first.start)} – ${fmtDay(last.end)}` : "—",
+          };
+        }),
+    []
+  );
+
   return (
     <div className="jams">
       <h2>Game jams</h2>
+
+      <p className="jams-authority">
+        <strong>Only the dates are authoritative.</strong> Themes, constraints,
+        AI policies and rating categories below are a snapshot from 10 August
+        2026 and go stale as soon as a jam page changes. Any agent working on
+        one of these games should treat the live project — its own repo, docs
+        and commits — as the reference, and read no further than this schedule.
+      </p>
+
+      <h3>Schedule</h3>
+      <table className="jams-schedule">
+        <thead>
+          <tr>
+            <th>Jam</th>
+            <th>Build</th>
+            <th>Deadline</th>
+          </tr>
+        </thead>
+        <tbody>
+          {schedule.map((row) => (
+            <tr
+              key={row.key}
+              className={active?.key === row.key ? "active" : undefined}
+              onClick={() => setSelected(row.key)}
+            >
+              <td>{row.name}</td>
+              <td>{row.build}</td>
+              <td>{fmt(row.end)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
       <p className="jams-intro">
-        Eight jams between August and December 2026. Windows are read off each
-        jam page and stored in UTC; times below are shown in your local zone.
-        Checklists live in this browser.
+        Windows are read off each jam page and stored in UTC; times are shown in
+        your local zone. Checklists live in this browser.
       </p>
 
       <div className="jams-next">
@@ -170,6 +228,17 @@ function Jams() {
                     {sprint.tasks.length}
                   </span>
                 </h4>
+                {sprint.jams.length > 1 && (
+                  <p className="jam-sprint-shared">
+                    One build, entered in{" "}
+                    {sprint.jams
+                      .map((k) => JAMS.find((j) => j.key === k)?.name)
+                      .filter(Boolean)
+                      .join(" and ")}
+                    . This checklist is shared — it appears under each jam, but
+                    it is a single effort, and ticking an item ticks it in both.
+                  </p>
+                )}
                 <ul className="jam-checklist">
                   {sprint.tasks.map((task) => {
                     const id = `${sprint.key}:${task}`;

@@ -1,3 +1,15 @@
+/**
+ * ONLY THE DATES IN THIS FILE ARE AUTHORITATIVE.
+ *
+ * Everything else — themes, constraints, AI policies, rating categories,
+ * participant counts, sprint task lists — is a snapshot taken on 2026-08-10 and
+ * goes stale the moment a jam page is edited or the plan changes.
+ *
+ * If you are an agent working on one of these games: the live project is the
+ * reference. Read its own repo, docs and commits. Do not treat anything below
+ * the date fields here as current, and do not carry it into your work.
+ */
+
 export type AiPolicy = "banned" | "assist" | "unstated";
 
 export interface Jam {
@@ -59,7 +71,8 @@ export const JAMS: Jam[] = [
     theme: "STARGAZING",
     constraints: [
       "Teams of 4 or fewer recommended",
-      "One entry per participant or team",
+      "One entry per participant or team — a cap on entries given to this jam, not on where else the game goes",
+      "Submitting the same game to another jam is permitted; the host confirmed it in a previous edition",
       "Theme announced at jam start — already known",
     ],
     ai: "assist",
@@ -200,7 +213,6 @@ export const SPRINTS: Sprint[] = [
     start: "2026-08-11T00:00:00Z",
     end: "2026-08-15T23:59:00Z",
     tasks: [
-      "Confirm neither jam forbids cross-submission",
       "Concept locked",
       "64×64 SubViewport rendering correctly",
       "Core loop playable",
