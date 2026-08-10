@@ -423,3 +423,37 @@ article code {
   font-size: 0.8rem;
   color: var(--cdark);
 }
+
+.jam-days {
+  list-style: none;
+  padding-left: 0;
+  margin: 0.4rem 0 1rem;
+  font-size: 0.88rem;
+}
+
+.jam-days li {
+  display: flex;
+  gap: 0.8rem;
+  padding: 0.3rem 0.5rem;
+  border-left: 2px solid var(--cmed);
+}
+
+.jam-days li.today {
+  border-left-color: var(--cemph);
+  background: var(--cemphbg);
+  font-weight: 700;
+}
+
+.jam-days li.past {
+  opacity: 0.5;
+}
+
+.jam-day-date {
+  flex: 0 0 8.5rem;
+  color: var(--cdark);
+  white-space: nowrap;
+}
+
+.jam-days li.today .jam-day-date {
+  color: var(--cemph);
+}

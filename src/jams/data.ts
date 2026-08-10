@@ -28,6 +28,12 @@ export interface Jam {
   prizes?: string;
 }
 
+export interface SprintDay {
+  /** UTC midnight of the day. */
+  date: string;
+  work: string;
+}
+
 export interface Sprint {
   key: string;
   label: string;
@@ -35,6 +41,8 @@ export interface Sprint {
   jams: string[];
   start: string;
   end: string;
+  /** One outcome per day. Present where the sprint has been planned out. */
+  days?: SprintDay[];
   tasks: string[];
 }
 
@@ -212,6 +220,23 @@ export const SPRINTS: Sprint[] = [
     jams: ["lowrez", "goedware"],
     start: "2026-08-10T00:00:00Z",
     end: "2026-08-15T23:59:00Z",
+    days: [
+      {
+        date: "2026-08-10",
+        work: "Join both jams, choose the game, and get a placeholder build running at 64×64 on itch",
+      },
+      { date: "2026-08-11", work: "Build the core loop until it plays" },
+      { date: "2026-08-12", work: "Add rounds, difficulty and scoring" },
+      { date: "2026-08-13", work: "Draw the stars and add sound" },
+      {
+        date: "2026-08-14",
+        work: "Add juice, menu and save — then stop adding features",
+      },
+      {
+        date: "2026-08-15",
+        work: "Fix bugs, write the itch page, submit to both jams",
+      },
+    ],
     tasks: [
       "Join LOWREZJAM on itch",
       "Join GoedWare on itch",

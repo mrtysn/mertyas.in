@@ -59,6 +59,16 @@ function fmtDay(iso: string): string {
   });
 }
 
+/** "Mon 10 Aug" — day plans are dates, never times. */
+function fmtWeekday(isoDate: string): string {
+  return new Date(`${isoDate}T00:00:00Z`).toLocaleDateString("en-GB", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  });
+}
+
 function countdown(iso: string, now: number): string {
   const ms = Date.parse(iso) - now;
   if (ms <= 0) return "closed";
@@ -130,6 +140,9 @@ function Jams() {
     JAMS.find((j) => j.key === selected) ?? nextOpen[0];
 
   const sprints = SPRINTS.filter((s) => active && s.jams.includes(active.key));
+
+  // Day plans are keyed by UTC date, so "today" must be resolved the same way.
+  const todayUtc = new Date(now).toISOString().slice(0, 10);
 
   // Dates only — the one part of this page that stays true.
   const schedule = useMemo(
@@ -294,6 +307,29 @@ function Jams() {
                     it is a single effort, and ticking an item ticks it in both.
                   </p>
                 )}
+                {sprint.days && (
+                  <ol className="jam-days">
+                    {sprint.days.map((day) => {
+                      const isToday = day.date === todayUtc;
+                      const past = day.date < todayUtc;
+                      return (
+                        <li
+                          key={day.date}
+                          className={
+                            isToday ? "today" : past ? "past" : undefined
+                          }
+                        >
+                          <span className="jam-day-date">
+                            {fmtWeekday(day.date)}
+                            {isToday && " · today"}
+                          </span>
+                          <span className="jam-day-work">{day.work}</span>
+                        </li>
+                      );
+                    })}
+                  </ol>
+                )}
+
                 <ul className="jam-checklist">
                   {sprint.tasks.map((task) => {
                     const id = `${sprint.key}:${task}`;
