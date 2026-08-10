@@ -6,6 +6,8 @@ import {
   JAMS,
   SPRINTS,
   AiPolicy,
+  Jam,
+  Sprint,
 } from "./data";
 
 const CHECKS_KEY = "jams:checks";
@@ -69,10 +71,6 @@ function countdown(iso: string, now: number): string {
   return `${mins}m`;
 }
 
-function jamName(key: string): string {
-  return JAMS.find((j) => j.key === key)?.name ?? key;
-}
-
 function Jams() {
   const [checks, setChecks] = useState<Record<string, boolean>>(loadChecks);
   const [now, setNow] = useState<number>(() => Date.now());
@@ -124,6 +122,48 @@ function Jams() {
     []
   );
 
+  /**
+   * One entry per thing you actually make. Builds and jams are not one-to-one —
+   * the 64×64 build feeds two jams, Brackeys takes two builds — so grouping by
+   * jam duplicates checklists and grouping by build duplicates jam rules.
+   * Grouping by the closure of both gives each effort exactly one section.
+   */
+  const entries = useMemo(() => {
+    const seen = new Set<string>();
+    const out: {
+      id: string;
+      label: string;
+      jams: Jam[];
+      sprints: Sprint[];
+    }[] = [];
+
+    for (const jam of orderedJams) {
+      if (seen.has(jam.key)) continue;
+
+      const sprints = SPRINTS.filter((s) => s.jams.includes(jam.key));
+      const keys = new Set<string>(sprints.flatMap((s) => s.jams));
+      keys.add(jam.key);
+
+      const jams = orderedJams.filter((j) => keys.has(j.key));
+      jams.forEach((j) => seen.add(j.key));
+
+      out.push({
+        id: `entry-${jams.map((j) => j.key).join("-")}`,
+        label: jams.map((j) => j.name).join(" + "),
+        jams,
+        sprints,
+      });
+    }
+    return out;
+  }, [orderedJams]);
+
+  /** Timeline rows and table rows are per jam; sections are per entry. */
+  const entryIdFor = useCallback(
+    (jamKey: string) =>
+      entries.find((e) => e.jams.some((j) => j.key === jamKey))?.id ?? "",
+    [entries]
+  );
+
   return (
     <div className="jams">
       <h2>Game jams</h2>
@@ -145,7 +185,7 @@ function Jams() {
         </thead>
         <tbody>
           {schedule.map((row) => (
-            <tr key={row.key} onClick={() => goTo(`jam-${row.key}`)}>
+            <tr key={row.key} onClick={() => goTo(entryIdFor(row.key))}>
               <td>{row.name}</td>
               <td>{row.build}</td>
               <td>{fmt(row.end)}</td>
@@ -155,41 +195,23 @@ function Jams() {
         </tbody>
       </table>
 
-      <Epg selected={focused.replace("jam-", "")} onSelect={(k) => goTo(`jam-${k}`)} />
+      <Epg selected="" onSelect={(k) => goTo(entryIdFor(k))} />
 
       <div className="jams-body">
         <nav className="jams-nav">
-          <span className="jams-nav-head">Builds</span>
-          {SPRINTS.map((sprint) => (
+          {entries.map((entry) => (
             <a
-              key={sprint.key}
-              href={`#build-${sprint.key}`}
-              className={focused === `build-${sprint.key}` ? "active" : ""}
+              key={entry.id}
+              href={`#${entry.id}`}
+              className={focused === entry.id ? "active" : ""}
               onClick={(e) => {
                 e.preventDefault();
-                goTo(`build-${sprint.key}`);
+                goTo(entry.id);
               }}
             >
-              {sprint.label}
+              {entry.label}
             </a>
           ))}
-
-          <span className="jams-nav-head">Jams</span>
-          {orderedJams.map((jam) => (
-            <a
-              key={jam.key}
-              href={`#jam-${jam.key}`}
-              className={focused === `jam-${jam.key}` ? "active" : ""}
-              onClick={(e) => {
-                e.preventDefault();
-                goTo(`jam-${jam.key}`);
-              }}
-            >
-              {jam.name}
-            </a>
-          ))}
-
-          <span className="jams-nav-head">Reference</span>
           <a
             href="#brackeys-themes"
             className={focused === "brackeys-themes" ? "active" : ""}
@@ -203,88 +225,84 @@ function Jams() {
         </nav>
 
         <div className="jams-sections">
-          <h3>Builds</h3>
-          {SPRINTS.map((sprint) => {
-            const done = sprint.tasks.filter(
-              (t) => checks[`${sprint.key}:${t}`]
-            ).length;
-            return (
-              <section
-                key={sprint.key}
-                id={`build-${sprint.key}`}
-                className="jam-detail"
-              >
-                <h4>
-                  {sprint.label}{" "}
-                  <span className="jam-sprint-meta">
-                    {fmtDay(sprint.start)} → {fmtDay(sprint.end)} · {done}/
-                    {sprint.tasks.length}
-                  </span>
-                </h4>
-                <p className="jam-sprint-shared">
-                  {sprint.jams.length > 1
-                    ? `One build, entered in ${sprint.jams
-                        .map(jamName)
-                        .join(" and ")}.`
-                    : `For ${sprint.jams.map(jamName).join(", ")}.`}
-                </p>
-                <ul className="jam-checklist">
-                  {sprint.tasks.map((task) => {
-                    const id = `${sprint.key}:${task}`;
-                    return (
-                      <li key={id}>
-                        <label className={checks[id] ? "done" : undefined}>
-                          <input
-                            type="checkbox"
-                            checked={!!checks[id]}
-                            onChange={() => toggle(id)}
-                          />
-                          {task}
-                        </label>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </section>
-            );
-          })}
+          {entries.map((entry) => (
+            <section key={entry.id} id={entry.id} className="jam-detail">
+              <h3>{entry.label}</h3>
 
-          <h3>Jams</h3>
-          {orderedJams.map((jam) => (
-            <section key={jam.key} id={`jam-${jam.key}`} className="jam-detail">
-              <h4>
-                <a href={jam.url} target="_blank" rel="noopener noreferrer">
-                  {jam.name}
-                </a>
-              </h4>
+              {entry.sprints.map((sprint) => {
+                const done = sprint.tasks.filter(
+                  (t) => checks[`${sprint.key}:${t}`]
+                ).length;
+                return (
+                  <div key={sprint.key}>
+                    <h4>
+                      {sprint.label}{" "}
+                      <span className="jam-sprint-meta">
+                        {fmtDay(sprint.start)} → {fmtDay(sprint.end)} · {done}/
+                        {sprint.tasks.length}
+                      </span>
+                    </h4>
+                    <ul className="jam-checklist">
+                      {sprint.tasks.map((task) => {
+                        const id = `${sprint.key}:${task}`;
+                        return (
+                          <li key={id}>
+                            <label className={checks[id] ? "done" : undefined}>
+                              <input
+                                type="checkbox"
+                                checked={!!checks[id]}
+                                onChange={() => toggle(id)}
+                              />
+                              {task}
+                            </label>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                );
+              })}
 
-              <dl className="jam-facts">
-                <dt>Window</dt>
-                <dd>
-                  {fmt(jam.start)} → {fmt(jam.end)}
-                </dd>
-                <dt>Theme</dt>
-                <dd>{jam.theme}</dd>
-                <dt>AI</dt>
-                <dd>
-                  <span className={`jam-ai ${jam.ai}`}>{AI_LABEL[jam.ai]}</span>{" "}
-                  {jam.aiNote}
-                </dd>
-                <dt>Rated on</dt>
-                <dd>{jam.ratings.join(" · ")}</dd>
-                {jam.prizes && (
-                  <>
-                    <dt>Prizes</dt>
-                    <dd>{jam.prizes}</dd>
-                  </>
-                )}
-              </dl>
+              {entry.jams.map((jam) => (
+                <div key={jam.key} className="jam-rules">
+                  <h4>
+                    <a href={jam.url} target="_blank" rel="noopener noreferrer">
+                      {jam.name}
+                    </a>{" "}
+                    <span className="jam-sprint-meta">the rules</span>
+                  </h4>
 
-              <ul className="jam-constraints">
-                {jam.constraints.map((c) => (
-                  <li key={c}>{c}</li>
-                ))}
-              </ul>
+                  <dl className="jam-facts">
+                    <dt>Window</dt>
+                    <dd>
+                      {fmt(jam.start)} → {fmt(jam.end)}
+                    </dd>
+                    <dt>Theme</dt>
+                    <dd>{jam.theme}</dd>
+                    <dt>AI</dt>
+                    <dd>
+                      <span className={`jam-ai ${jam.ai}`}>
+                        {AI_LABEL[jam.ai]}
+                      </span>{" "}
+                      {jam.aiNote}
+                    </dd>
+                    <dt>Rated on</dt>
+                    <dd>{jam.ratings.join(" · ")}</dd>
+                    {jam.prizes && (
+                      <>
+                        <dt>Prizes</dt>
+                        <dd>{jam.prizes}</dd>
+                      </>
+                    )}
+                  </dl>
+
+                  <ul className="jam-constraints">
+                    {jam.constraints.map((c) => (
+                      <li key={c}>{c}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </section>
           ))}
 

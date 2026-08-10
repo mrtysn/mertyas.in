@@ -158,7 +158,9 @@ article code {
 
 .epg-labels {
   flex: 0 0 auto;
-  width: 180px;
+  /* Wide enough for the longest jam name — "Brackeys Game Jam 2026.2" —
+     so no row is ever truncated. */
+  width: 15rem;
   border-right: 1px solid var(--cmed);
   background: var(--clight);
 }
@@ -532,4 +534,14 @@ article code {
 .epg-legend-note {
   flex-basis: 100%;
   font-style: italic;
+}
+
+.jam-rules {
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--cmed);
+}
+
+.jam-rules h4 a {
+  text-decoration: none;
 }
