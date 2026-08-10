@@ -424,3 +424,74 @@ article code {
   color: var(--cdark);
 }
 
+
+.jams-body {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  margin-top: 1.5rem;
+}
+
+.jams-nav {
+  position: sticky;
+  top: 1rem;
+  flex: 0 0 11rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-size: 0.8rem;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+}
+
+.jams-nav-head {
+  margin-top: 0.7rem;
+  color: var(--cdark);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+}
+
+.jams-nav-head:first-child {
+  margin-top: 0;
+}
+
+.jams-nav a {
+  padding: 0.2rem 0.5rem;
+  border-left: 2px solid var(--cmed);
+  text-decoration: none;
+  color: var(--cfg);
+}
+
+.jams-nav a:hover {
+  background: var(--clight);
+}
+
+.jams-nav a.active {
+  border-left-color: var(--cemph);
+  background: var(--cemphbg);
+  color: var(--cemph);
+}
+
+.jams-sections {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.jams-sections section {
+  scroll-margin-top: 1rem;
+}
+
+@media (max-width: 700px) {
+  .jams-body {
+    flex-direction: column;
+  }
+
+  .jams-nav {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-height: none;
+  }
+}
