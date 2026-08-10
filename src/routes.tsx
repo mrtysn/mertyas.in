@@ -20,6 +20,13 @@ export const routes: RouteProps[] = [
     component: About,
   },
   {
+    // The nav labels this "About", so /about is a URL people type. Without it
+    // the request falls through to the "/:slug" catch-all and reports a
+    // missing post.
+    path: "/about",
+    component: About,
+  },
+  {
     path: "/projects",
     component: Projects,
   },
