@@ -495,3 +495,41 @@ article code {
     max-height: none;
   }
 }
+
+.epg-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 1.1rem;
+  margin: 1rem 0 0.4rem;
+  font-size: 0.78rem;
+  color: var(--cdark);
+}
+
+.epg-key {
+  display: inline-block;
+  width: 1.4rem;
+  height: 0.7rem;
+  margin-right: 0.3rem;
+  vertical-align: -1px;
+  border-radius: 2px;
+}
+
+.epg-key-build {
+  background: var(--cemph);
+}
+
+.epg-key-window {
+  border: 1px solid var(--cmed);
+  background: var(--clight);
+}
+
+.epg-key-now {
+  width: 2px;
+  background: #da0037;
+}
+
+.epg-legend-note {
+  flex-basis: 100%;
+  font-style: italic;
+}

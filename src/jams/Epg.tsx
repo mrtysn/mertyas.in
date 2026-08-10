@@ -97,80 +97,98 @@ function Epg({ selected, onSelect }: EpgProps) {
   }, [nowLeft, nowVisible]);
 
   return (
-    <div className="epg">
-      <div className="epg-labels">
-        <div className="epg-corner" />
-        {model.rows.map(({ jam }) => (
-          <button
-            key={jam.key}
-            type="button"
-            className={`epg-label${selected === jam.key ? " active" : ""}`}
-            onClick={() => onSelect(jam.key)}
-          >
-            {jam.name}
-          </button>
-        ))}
+    <>
+      <div className="epg-legend">
+        <span>
+          <i className="epg-key epg-key-build" /> build — the days you work on it
+        </span>
+        <span>
+          <i className="epg-key epg-key-window" /> jam window — open to deadline
+        </span>
+        <span>
+          <i className="epg-key epg-key-now" /> now
+        </span>
+        <span className="epg-legend-note">
+          A build sitting outside its window is preparation done before the jam
+          opens.
+        </span>
       </div>
 
-      <div className="epg-scroll" ref={scrollRef}>
-        <div className="epg-inner" style={{ width: `${model.width}px` }}>
-          <div className="epg-ruler">
-            <div className="epg-months">
-              {model.months.map((m) => (
-                <span
-                  key={m.label}
-                  className="epg-month"
-                  style={{ left: `${m.left}px`, width: `${m.width}px` }}
-                >
-                  {m.label}
-                </span>
-              ))}
-            </div>
-            <div className="epg-ticks">
-              {model.ticks.map((t) => (
-                <span
-                  key={t.left}
-                  className="epg-tick"
-                  style={{ left: `${t.left}px` }}
-                >
-                  {t.label}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {model.rows.map(({ jam, left, width, sprints }) => (
-            <div
+      <div className="epg">
+        <div className="epg-labels">
+          <div className="epg-corner" />
+          {model.rows.map(({ jam }) => (
+            <button
               key={jam.key}
-              className={`epg-row${selected === jam.key ? " active" : ""}`}
+              type="button"
+              className={`epg-label${selected === jam.key ? " active" : ""}`}
               onClick={() => onSelect(jam.key)}
             >
-              <div
-                className="epg-window"
-                style={{ left: `${left}px`, width: `${width}px` }}
-                title={`${jam.name} — jam window`}
-              />
-              {sprints.map((s) => (
-                <div
-                  key={s.key}
-                  className="epg-sprint"
-                  style={{ left: `${s.left}px`, width: `${s.width}px` }}
-                  title={s.label}
-                >
-                  <span>{s.label}</span>
-                </div>
-              ))}
-            </div>
+              {jam.name}
+            </button>
           ))}
+        </div>
 
-          {nowVisible && (
-            <div className="epg-now" style={{ left: `${nowLeft}px` }}>
-              <span className="epg-now-dot" />
+        <div className="epg-scroll" ref={scrollRef}>
+          <div className="epg-inner" style={{ width: `${model.width}px` }}>
+            <div className="epg-ruler">
+              <div className="epg-months">
+                {model.months.map((m) => (
+                  <span
+                    key={m.label}
+                    className="epg-month"
+                    style={{ left: `${m.left}px`, width: `${m.width}px` }}
+                  >
+                    {m.label}
+                  </span>
+                ))}
+              </div>
+              <div className="epg-ticks">
+                {model.ticks.map((t) => (
+                  <span
+                    key={t.left}
+                    className="epg-tick"
+                    style={{ left: `${t.left}px` }}
+                  >
+                    {t.label}
+                  </span>
+                ))}
+              </div>
             </div>
-          )}
+
+            {model.rows.map(({ jam, left, width, sprints }) => (
+              <div
+                key={jam.key}
+                className={`epg-row${selected === jam.key ? " active" : ""}`}
+                onClick={() => onSelect(jam.key)}
+              >
+                <div
+                  className="epg-window"
+                  style={{ left: `${left}px`, width: `${width}px` }}
+                  title={`${jam.name} — jam window`}
+                />
+                {sprints.map((s) => (
+                  <div
+                    key={s.key}
+                    className="epg-sprint"
+                    style={{ left: `${s.left}px`, width: `${s.width}px` }}
+                    title={s.label}
+                  >
+                    <span>{s.label}</span>
+                  </div>
+                ))}
+              </div>
+            ))}
+
+            {nowVisible && (
+              <div className="epg-now" style={{ left: `${nowLeft}px` }}>
+                <span className="epg-now-dot" />
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
