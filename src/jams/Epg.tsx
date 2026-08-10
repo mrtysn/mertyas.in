@@ -24,11 +24,11 @@ function startOfUtcDay(ms: number): number {
 }
 
 interface EpgProps {
-  selected: string;
+  /** Scrolls to the section for the jam whose row was clicked. */
   onSelect: (key: string) => void;
 }
 
-function Epg({ selected, onSelect }: EpgProps) {
+function Epg({ onSelect }: EpgProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const model = useMemo(() => {
@@ -121,7 +121,7 @@ function Epg({ selected, onSelect }: EpgProps) {
             <button
               key={jam.key}
               type="button"
-              className={`epg-label${selected === jam.key ? " active" : ""}`}
+              className="epg-label"
               onClick={() => onSelect(jam.key)}
             >
               {jam.name}
@@ -159,7 +159,7 @@ function Epg({ selected, onSelect }: EpgProps) {
             {model.rows.map(({ jam, left, width, sprints }) => (
               <div
                 key={jam.key}
-                className={`epg-row${selected === jam.key ? " active" : ""}`}
+                className="epg-row"
                 onClick={() => onSelect(jam.key)}
               >
                 <div

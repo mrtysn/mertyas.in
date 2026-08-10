@@ -106,48 +106,6 @@ article code {
   font-size: 0.9rem;
 }
 
-.jams-next {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-  gap: 0.5rem;
-  margin: 1rem 0;
-}
-
-.jams-next-card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.15rem;
-  padding: 0.6rem 0.8rem;
-  border: 1px solid var(--cmed);
-  border-left: 3px solid var(--cmed);
-  border-radius: 6px;
-  background: none;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.jams-next-card.active {
-  border-left-color: var(--cemph);
-  background: var(--cemphbg);
-}
-
-.jams-next-time {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--cemph);
-}
-
-.jams-next-name {
-  font-size: 0.9rem;
-}
-
-.jams-next-close {
-  font-size: 0.75rem;
-  color: var(--cdark);
-}
-
 .epg {
   display: flex;
   border: 1px solid var(--cmed);
@@ -199,11 +157,6 @@ article code {
   cursor: pointer;
 }
 
-.epg-label.active {
-  border-left-color: var(--cemph);
-  background: var(--cemphbg);
-}
-
 .epg-scroll {
   flex: 1 1 auto;
   overflow-x: auto;
@@ -250,10 +203,6 @@ article code {
   height: 35px;
   border-bottom: 1px solid var(--cmed);
   cursor: pointer;
-}
-
-.epg-row.active {
-  background: var(--cemphbg);
 }
 
 .epg-window {
@@ -380,26 +329,6 @@ article code {
   text-decoration: line-through;
 }
 
-.jams-themes {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: 0.3rem;
-  margin: 1rem 0;
-  font-size: 0.85rem;
-}
-
-.jams-theme {
-  display: flex;
-  gap: 0.6rem;
-  padding: 0.3rem 0.5rem;
-  border-left: 2px solid var(--cmed);
-}
-
-.jams-theme-ed {
-  color: var(--cdark);
-  font-variant-numeric: tabular-nums;
-}
-
 .jams-authority {
   padding: 0.7rem 0.9rem;
   border-left: 3px solid var(--cemph);
@@ -414,16 +343,6 @@ article code {
 
 .jams-schedule tbody tr {
   cursor: pointer;
-}
-
-.jams-schedule tbody tr.active {
-  background: var(--cemphbg);
-}
-
-.jam-sprint-shared {
-  margin: 0.2rem 0 0.5rem;
-  font-size: 0.8rem;
-  color: var(--cdark);
 }
 
 
@@ -444,19 +363,6 @@ article code {
   font-size: 0.8rem;
   max-height: calc(100vh - 2rem);
   overflow-y: auto;
-}
-
-.jams-nav-head {
-  margin-top: 0.7rem;
-  color: var(--cdark);
-  font-weight: 700;
-  text-transform: uppercase;
-  font-size: 0.68rem;
-  letter-spacing: 0.05em;
-}
-
-.jams-nav-head:first-child {
-  margin-top: 0;
 }
 
 .jams-nav a {
@@ -544,4 +450,10 @@ article code {
 
 .jam-rules h4 a {
   text-decoration: none;
+}
+
+.jams-left {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }

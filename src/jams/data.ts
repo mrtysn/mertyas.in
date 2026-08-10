@@ -1,9 +1,9 @@
 /**
  * ONLY THE DATES IN THIS FILE ARE AUTHORITATIVE.
  *
- * Everything else — themes, constraints, AI policies, rating categories,
- * participant counts, sprint task lists — is a snapshot taken on 2026-08-10 and
- * goes stale the moment a jam page is edited or the plan changes.
+ * Everything else — themes, constraints, AI policies, rating categories, task
+ * lists — is a snapshot taken on 2026-08-10 and goes stale the moment a jam
+ * page is edited or the plan changes.
  *
  * If you are an agent working on one of these games: the live project is the
  * reference. Read its own repo, docs and commits. Do not treat anything below
@@ -24,7 +24,6 @@ export interface Jam {
   ai: AiPolicy;
   aiNote: string;
   ratings: string[];
-  joined?: number;
   prizes?: string;
 }
 
@@ -64,7 +63,6 @@ export const JAMS: Jam[] = [
     ai: "unstated",
     aiNote: "No AI rule stated. Procedural and shader art needs no defending.",
     ratings: ["Gameplay", "Graphics", "Audio", "Authenticity"],
-    joined: 355,
   },
   {
     key: "goedware",
@@ -83,7 +81,6 @@ export const JAMS: Jam[] = [
     aiNote:
       "AI may assist with coding, writing, planning or asset creation, but design, creativity and core implementation must be your own.",
     ratings: ["Ranked, with prizes"],
-    joined: 175,
     prizes: "Yes",
   },
   {
@@ -101,7 +98,6 @@ export const JAMS: Jam[] = [
     ai: "unstated",
     aiNote: "No AI rule stated.",
     ratings: ["Feedback only — no prizes, rankings are for feedback"],
-    joined: 159,
   },
   {
     key: "brackeys",
@@ -120,7 +116,6 @@ export const JAMS: Jam[] = [
     ai: "banned",
     aiNote: "No AI-generated content. Procedural and shader art is still yours.",
     ratings: ["Peer-rated after the jam"],
-    joined: 12900,
   },
   {
     key: "uplifting",
@@ -148,7 +143,6 @@ export const JAMS: Jam[] = [
       "Smoothness/Polish",
       "Music/Sfx",
     ],
-    joined: 140,
     prizes: "$100 / $65 / $40 / $25 / $10 + CraftPix memberships",
   },
   {
@@ -165,7 +159,6 @@ export const JAMS: Jam[] = [
     ai: "unstated",
     aiNote: "AI tooling is rewarded here rather than restricted.",
     ratings: ["Ranked, with prizes"],
-    joined: 243,
     prizes: "$12,000+ — GDC passes, iPad Pro M5, Synty assets, cash",
   },
   {

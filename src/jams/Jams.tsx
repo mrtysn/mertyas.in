@@ -195,7 +195,7 @@ function Jams() {
         </tbody>
       </table>
 
-      <Epg selected="" onSelect={(k) => goTo(entryIdFor(k))} />
+      <Epg onSelect={(k) => goTo(entryIdFor(k))} />
 
       <div className="jams-body">
         <nav className="jams-nav">
