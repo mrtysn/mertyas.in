@@ -6,7 +6,6 @@ import {
   JAMS,
   SPRINTS,
   AiPolicy,
-  Jam,
 } from "./data";
 
 const CHECKS_KEY = "jams:checks";
@@ -100,38 +99,6 @@ function Jams() {
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
 
-  const nextOpen = useMemo(
-    () =>
-      [...JAMS]
-        .filter((j) => Date.parse(j.end) > now)
-        .sort((a, b) => Date.parse(a.end) - Date.parse(b.end)),
-    [now]
-  );
-
-  // Jams fed by one shared sprint are one piece of work, so they get one card.
-  const nextCards = useMemo(() => {
-    const seen = new Set<string>();
-    const cards: { key: string; jams: Jam[]; label: string; end: string }[] = [];
-
-    for (const jam of nextOpen) {
-      if (seen.has(jam.key)) continue;
-      const shared = SPRINTS.find(
-        (s) => s.jams.includes(jam.key) && s.jams.length > 1
-      );
-      const group = shared
-        ? nextOpen.filter((j) => shared.jams.includes(j.key))
-        : [jam];
-      group.forEach((j) => seen.add(j.key));
-      cards.push({
-        key: group.map((j) => j.key).join("+"),
-        jams: group,
-        label: group.map((j) => j.name).join(" + "),
-        end: group[0].end,
-      });
-    }
-    return cards;
-  }, [nextOpen]);
-
   const schedule = useMemo(
     () =>
       [...JAMS]
@@ -162,20 +129,18 @@ function Jams() {
       <h2>Game jams</h2>
 
       <p className="jams-authority">
-        <strong>Only the dates are authoritative.</strong> Themes, constraints,
-        AI policies and rating categories below are a snapshot from 10 August
-        2026 and go stale as soon as a jam page changes. Any agent working on
-        one of these games should treat the live project — its own repo, docs
-        and commits — as the reference, and read no further than this schedule.
+        <strong>Only the dates are authoritative.</strong> Everything else is a
+        snapshot from 10 August 2026. An agent working on one of these games
+        should read the live project, not this page.
       </p>
 
-      <h3>Schedule</h3>
       <table className="jams-schedule">
         <thead>
           <tr>
             <th>Jam</th>
             <th>Build</th>
-            <th>Deadline ({TZ_LABEL})</th>
+            <th>Closes ({TZ_LABEL})</th>
+            <th>Left</th>
           </tr>
         </thead>
         <tbody>
@@ -184,43 +149,11 @@ function Jams() {
               <td>{row.name}</td>
               <td>{row.build}</td>
               <td>{fmt(row.end)}</td>
+              <td className="jams-left">{countdown(row.end, now)}</td>
             </tr>
           ))}
         </tbody>
       </table>
-
-      <p className="jams-intro">
-        Windows are read off each jam page and stored in UTC. Every time on this
-        page is shown in {TZ_LABEL} on a 24-hour clock, not in your browser's
-        zone — Firefox with fingerprint resistance reports UTC and would show
-        every deadline three hours early. Checklists live in this browser.
-      </p>
-
-      <div className="jams-next">
-        {nextCards.slice(0, 4).map((card) => (
-          <button
-            key={card.key}
-            type="button"
-            className="jams-next-card"
-            onClick={() => goTo(`jam-${card.jams[0].key}`)}
-          >
-            <span className="jams-next-time">{countdown(card.end, now)}</span>
-            <span className="jams-next-name">{card.label}</span>
-            {card.jams.length > 1 ? (
-              <>
-                <span className="jams-next-close">
-                  one build · first deadline {fmt(card.end)}
-                </span>
-                <span className="jams-next-close">
-                  then {fmt(card.jams[card.jams.length - 1].end)}
-                </span>
-              </>
-            ) : (
-              <span className="jams-next-close">closes {fmt(card.end)}</span>
-            )}
-          </button>
-        ))}
-      </div>
 
       <Epg selected={focused.replace("jam-", "")} onSelect={(k) => goTo(`jam-${k}`)} />
 
@@ -345,12 +278,6 @@ function Jams() {
                     <dd>{jam.prizes}</dd>
                   </>
                 )}
-                {jam.joined && (
-                  <>
-                    <dt>Joined</dt>
-                    <dd>{jam.joined.toLocaleString()}</dd>
-                  </>
-                )}
               </dl>
 
               <ul className="jam-constraints">
@@ -362,25 +289,25 @@ function Jams() {
           ))}
 
           <section id="brackeys-themes">
-            <h3>Brackeys theme history</h3>
-            <p className="jams-intro">
-              Every theme below was read off the announcement banner on its own
-              jam page. The patterns are what the prep list is built against.
-            </p>
-            <div className="jams-themes">
-              {BRACKEYS_THEMES.map((t) => (
-                <div key={t.edition} className="jams-theme">
-                  <span className="jams-theme-ed">{t.edition}</span>
-                  <span className="jams-theme-name">{t.theme}</span>
-                </div>
-              ))}
-            </div>
+            <h3>Brackeys theme patterns</h3>
             <ul className="jam-constraints">
               {BRACKEYS_PATTERNS.map((p) => (
                 <li key={p}>{p}</li>
               ))}
             </ul>
+            <p className="jams-intro">
+              Derived from all fourteen editions, each read off its own
+              announcement banner:{" "}
+              {BRACKEYS_THEMES.map((t) => t.theme).join(" · ")}.
+            </p>
           </section>
+
+          <p className="jams-intro">
+            Windows are read off each jam page and stored in UTC. Times show in{" "}
+            {TZ_LABEL} on a 24-hour clock rather than your browser's zone —
+            Firefox with fingerprint resistance reports UTC and would show every
+            deadline three hours early. Checklists live in this browser.
+          </p>
         </div>
       </div>
     </div>
