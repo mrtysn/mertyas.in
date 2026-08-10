@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "validate": "./validate.sh",
-    "import:bookmarks": "tsx scripts/bookmarks/build-bookmarks.ts --input",
+    "import:bookmarks": "tsx scripts/bookmarks/build-bookmarks.ts",
     "bookmarks:check": "tsx scripts/bookmarks/check-links.ts",
     "bookmarks:previews": "tsx scripts/bookmarks/fetch-previews.ts",
     "bookmarks:organize": "tsx scripts/bookmarks/llm-organize.ts",

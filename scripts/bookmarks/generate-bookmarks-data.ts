@@ -35,15 +35,44 @@ export function generateBookmarksData(parsedTree: ParsedNode): BookmarksData {
 }
 
 /**
- * Write BookmarksData to disk.
+ * The bookmarks minus every field that moves on its own each run —
+ * `importDate`, `buildInfo` and `syncInfo` all carry timestamps or run logs.
+ * Two runs with the same result produce the same string here, which is what
+ * lets an unchanged run skip writing. Anything genuinely new lands in `root`
+ * or `flatBookmarks`, both of which are still compared.
  */
-export function writeBookmarksData(data: BookmarksData): void {
+export function stableContent(data: BookmarksData): string {
+  const clone: Partial<BookmarksData> = { ...data };
+  delete clone.importDate;
+  delete clone.buildInfo;
+  delete clone.syncInfo;
+  return JSON.stringify(clone);
+}
+
+/**
+ * Write BookmarksData to disk, unless the result is identical to what is
+ * already there. Returns whether it wrote.
+ *
+ * Every write path goes through here, so an unchanged import or build leaves
+ * the file byte-identical instead of producing a diff made purely of its own
+ * timestamps.
+ */
+export function writeBookmarksData(data: BookmarksData): boolean {
   const dataDir = path.dirname(DATA_PATH);
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
   }
+
+  if (fs.existsSync(DATA_PATH)) {
+    const existing = JSON.parse(
+      fs.readFileSync(DATA_PATH, 'utf-8')
+    ) as BookmarksData;
+    if (stableContent(existing) === stableContent(data)) return false;
+  }
+
   fs.writeFileSync(DATA_PATH, JSON.stringify(data, null, 2), 'utf-8');
   console.log(`  Generated bookmarks data: ${data.flatBookmarks.length} bookmarks`);
+  return true;
 }
 
 /**

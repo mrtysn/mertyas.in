@@ -14,10 +14,26 @@ const __dirname = path.dirname(__filename);
 
 const DATA_PATH = path.join(__dirname, '../../src/bookmarks/data/bookmarks.json');
 
+/**
+ * Whether a build may stamp `.cache/bookmarks-cache.json` link-check results
+ * into bookmarks.json.
+ *
+ * Off, because the stamping has no freshness guard: every build applies
+ * whatever the cache holds, however old. The cache currently holds a single
+ * run from 2026-02-06 in which 2,022 of 2,551 requests failed — an offline or
+ * rate-limited run — so each build was rewriting thousands of live links as
+ * dead. Turning this back on needs an age check on `cached.checkedAt` first.
+ *
+ * The checker itself (`pnpm run bookmarks:check`) is unaffected; it writes the
+ * cache, and only this stamping step reads it.
+ */
+const APPLY_LINK_CHECK_CACHE = false;
+
 interface BuildOptions {
   input?: string;
   forceReplace?: boolean;
 }
+
 
 /**
  * Main orchestrator for building bookmarks
@@ -85,12 +101,14 @@ async function buildBookmarks(options: BuildOptions = {}): Promise<void> {
     const cache = loadCache();
 
     // 4. Persist link check results from cache into bookmarks
-    for (const bookmark of bookmarksData.flatBookmarks) {
-      const cached = cache.bookmarks[bookmark.id]?.linkCheck;
-      if (cached) {
-        bookmark.statusCode = cached.statusCode;
-        bookmark.lastChecked = cached.checkedAt;
-        bookmark.checkError = cached.error;
+    if (APPLY_LINK_CHECK_CACHE) {
+      for (const bookmark of bookmarksData.flatBookmarks) {
+        const cached = cache.bookmarks[bookmark.id]?.linkCheck;
+        if (cached) {
+          bookmark.statusCode = cached.statusCode;
+          bookmark.lastChecked = cached.checkedAt;
+          bookmark.checkError = cached.error;
+        }
       }
     }
 
@@ -106,13 +124,21 @@ async function buildBookmarks(options: BuildOptions = {}): Promise<void> {
 
     // 6. Update build metadata
     bookmarksData.buildInfo.lastBuild = Date.now();
-    bookmarksData.buildInfo.checkedCount = Object.keys(cache.bookmarks).filter(
-      id => cache.bookmarks[id].linkCheck
-    ).length;
+    // Counts what actually reached bookmarks.json, not what sits in the cache —
+    // with APPLY_LINK_CHECK_CACHE off those are different numbers.
+    bookmarksData.buildInfo.checkedCount = APPLY_LINK_CHECK_CACHE
+      ? Object.keys(cache.bookmarks).filter(id => cache.bookmarks[id].linkCheck)
+          .length
+      : bookmarksData.flatBookmarks.filter(b => b.lastChecked !== undefined)
+          .length;
 
-    fs.writeFileSync(DATA_PATH, JSON.stringify(bookmarksData, null, 2), 'utf-8');
+    const wrote = writeBookmarksData(bookmarksData);
 
-    console.log('\nBookmarks build complete!');
+    console.log(
+      wrote
+        ? '\nBookmarks build complete!'
+        : '\nNo changes — bookmarks.json left untouched.'
+    );
     console.log(`  Total bookmarks: ${bookmarksData.flatBookmarks.length}`);
     console.log(`  Links checked: ${bookmarksData.buildInfo.checkedCount}`);
   } catch (error: unknown) {

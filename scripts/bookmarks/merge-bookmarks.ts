@@ -80,23 +80,29 @@ export function mergeBookmarks(
   // Merge folder GUIDs from existing into incoming where missing
   mergeFolderGuids(existing.root, incoming.root);
 
-  // Preserve sync history
-  const historyEntry: SyncHistoryEntry = {
-    date: Date.now(),
-    source,
-    added,
-    updated,
-    unchanged,
-  };
+  // Preserve sync history. A no-op import records nothing — otherwise every
+  // re-run of the same file appends an empty entry and moves the timestamp,
+  // which dirties bookmarks.json without anything having changed.
+  if (added + updated > 0) {
+    const historyEntry: SyncHistoryEntry = {
+      date: Date.now(),
+      source,
+      added,
+      updated,
+      unchanged,
+    };
 
-  incoming.syncInfo = {
-    lastImportSource: source,
-    lastImportDate: Date.now(),
-    importHistory: [
-      ...(existing.syncInfo?.importHistory || []),
-      historyEntry,
-    ],
-  };
+    incoming.syncInfo = {
+      lastImportSource: source,
+      lastImportDate: Date.now(),
+      importHistory: [
+        ...(existing.syncInfo?.importHistory || []),
+        historyEntry,
+      ],
+    };
+  } else {
+    incoming.syncInfo = existing.syncInfo;
+  }
 
   // Preserve build info from existing
   incoming.buildInfo = {
