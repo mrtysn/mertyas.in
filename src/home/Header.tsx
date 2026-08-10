@@ -22,6 +22,9 @@ function Header() {
         <li>
           <Link href="/bookmarks">Bookmarks</Link>
         </li>
+        <li>
+          <Link href="/jams">Jams</Link>
+        </li>
       </ul>
     </nav>
   );
