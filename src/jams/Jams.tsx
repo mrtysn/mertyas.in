@@ -86,6 +86,35 @@ function Jams() {
     [now]
   );
 
+  // Jams fed by one shared sprint are one piece of work, so they get one card.
+  // Two cards would read as two games to make.
+  const nextCards = useMemo(() => {
+    const seen = new Set<string>();
+    const cards: { key: string; jams: Jam[]; label: string; end: string }[] = [];
+
+    for (const jam of nextOpen) {
+      if (seen.has(jam.key)) continue;
+
+      const shared = SPRINTS.find(
+        (s) => s.jams.includes(jam.key) && s.jams.length > 1
+      );
+      const group = shared
+        ? nextOpen.filter((j) => shared.jams.includes(j.key))
+        : [jam];
+
+      group.forEach((j) => seen.add(j.key));
+      cards.push({
+        key: group.map((j) => j.key).join("+"),
+        jams: group,
+        label: group.map((j) => j.name).join(" + "),
+        // nextOpen is sorted by deadline, so the first is the binding one.
+        end: group[0].end,
+      });
+    }
+
+    return cards;
+  }, [nextOpen]);
+
   const active: Jam | undefined =
     JAMS.find((j) => j.key === selected) ?? nextOpen[0];
 
@@ -154,16 +183,29 @@ function Jams() {
       </p>
 
       <div className="jams-next">
-        {nextOpen.slice(0, 4).map((jam) => (
+        {nextCards.slice(0, 4).map((card) => (
           <button
-            key={jam.key}
+            key={card.key}
             type="button"
-            className={`jams-next-card${active?.key === jam.key ? " active" : ""}`}
-            onClick={() => setSelected(jam.key)}
+            className={`jams-next-card${
+              card.jams.some((j) => j.key === active?.key) ? " active" : ""
+            }`}
+            onClick={() => setSelected(card.jams[0].key)}
           >
-            <span className="jams-next-time">{countdown(jam.end, now)}</span>
-            <span className="jams-next-name">{jam.name}</span>
-            <span className="jams-next-close">closes {fmt(jam.end)}</span>
+            <span className="jams-next-time">{countdown(card.end, now)}</span>
+            <span className="jams-next-name">{card.label}</span>
+            {card.jams.length > 1 ? (
+              <>
+                <span className="jams-next-close">
+                  one build · first deadline {fmt(card.end)}
+                </span>
+                <span className="jams-next-close">
+                  then {fmt(card.jams[card.jams.length - 1].end)}
+                </span>
+              </>
+            ) : (
+              <span className="jams-next-close">closes {fmt(card.end)}</span>
+            )}
           </button>
         ))}
       </div>
