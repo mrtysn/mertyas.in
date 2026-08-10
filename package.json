@@ -16,6 +16,7 @@
     "bookmarks:apply": "tsx scripts/bookmarks/apply-suggestions.ts",
     "bookmarks:wayback": "tsx scripts/bookmarks/check-wayback.ts",
     "bookmarks:export": "tsx scripts/bookmarks/export-firefox-json.ts",
+    "bookmarks:dump-firefox": "python3 scripts/bookmarks/export-firefox-places.py",
     "bookmarks:diff": "tsx scripts/bookmarks/sync-diff.ts",
     "bookmarks:migrate": "tsx scripts/bookmarks/migrate-v2.ts",
     "bookmarks:admin": "tsx scripts/bookmarks/admin/server.ts",
