@@ -28,12 +28,6 @@ export interface Jam {
   prizes?: string;
 }
 
-export interface SprintDay {
-  /** UTC midnight of the day. */
-  date: string;
-  work: string;
-}
-
 export interface Sprint {
   key: string;
   label: string;
@@ -41,8 +35,10 @@ export interface Sprint {
   jams: string[];
   start: string;
   end: string;
-  /** One outcome per day. Present where the sprint has been planned out. */
-  days?: SprintDay[];
+  /**
+   * The complete list of work, in the order it makes sense to do it. No dates
+   * and no per-day split — the only dates here are the jams' own deadlines.
+   */
   tasks: string[];
 }
 
@@ -220,23 +216,6 @@ export const SPRINTS: Sprint[] = [
     jams: ["lowrez", "goedware"],
     start: "2026-08-10T00:00:00Z",
     end: "2026-08-15T23:59:00Z",
-    days: [
-      {
-        date: "2026-08-10",
-        work: "Join both jams, choose the game, and get a placeholder build running at 64×64 on itch",
-      },
-      { date: "2026-08-11", work: "Build the core loop until it plays" },
-      { date: "2026-08-12", work: "Add rounds, difficulty and scoring" },
-      { date: "2026-08-13", work: "Draw the stars and add sound" },
-      {
-        date: "2026-08-14",
-        work: "Add juice, menu and save — then stop adding features",
-      },
-      {
-        date: "2026-08-15",
-        work: "Fix bugs, write the itch page, submit to both jams",
-      },
-    ],
     tasks: [
       "Join LOWREZJAM on itch",
       "Join GoedWare on itch",
@@ -244,11 +223,22 @@ export const SPRINTS: Sprint[] = [
       "Add the game to oj — registry row, source folder, web profile",
       "Render the game at 64×64 and scale it up without blurring",
       "Publish a placeholder web build to itch",
+      "Generate the star field",
       "Build the core loop until it plays",
+      "Add the win and lose conditions",
+      "Add rounds and a difficulty ramp",
+      "Add scoring",
+      "Draw the stars — the procedural rendering pass",
+      "Add sound and music",
+      "Add juice — particles, transitions, feedback on selection",
+      "Add a menu, settings and save",
+      "Stop adding features",
+      "Fix the bugs",
       "Open the itch build on a machine you have never used",
       "Write the itch page — cover, screenshots, description",
       "Submit to LOWREZJAM before 16 Aug, 14:00",
       "Submit to GoedWare before 16 Aug, 23:00",
+      "Rate other entries during voting",
     ],
   },
   {
@@ -288,11 +278,11 @@ export const SPRINTS: Sprint[] = [
     end: "2026-08-29T23:59:00Z",
     tasks: [
       "Read the theme when it lands on 23 Aug",
-      "Choose the game the same day",
-      "Get a vertical slice playable by day 3",
-      "Finish the content by day 5",
-      "Polish and export for web by day 6",
-      "Submit on day 6 — there is no grace period",
+      "Choose the game",
+      "Get a vertical slice playable",
+      "Finish the content",
+      "Polish and export for web",
+      "Submit before 30 Aug, 13:00 — there is no grace period",
       "Rate other entries",
     ],
   },
@@ -333,7 +323,7 @@ export const SPRINTS: Sprint[] = [
     tasks: [
       "Enter the Jam track, not Compo",
       "Read the theme when it lands on 17 Oct",
-      "Get it playable on day 1",
+      "Get it playable",
       "Submit before the 72 hours are up",
     ],
   },
