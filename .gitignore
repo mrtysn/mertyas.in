@@ -34,3 +34,8 @@ src/bookmarks/data/.cache/
 
 # machine-local: skills this repo opts out of (see .agents/scripts/init.sh)
 .agents-ignore
+
+# Firefox signing build output (npx web-ext sign)
+*.xpi
+web-ext-artifacts/
+.amo-upload-uuid

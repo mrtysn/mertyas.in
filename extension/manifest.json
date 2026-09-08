@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Bookmarks Sync",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Export and import bookmarks for mertyas.in sync",
   "permissions": [
     "bookmarks",
@@ -9,6 +9,17 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Bookmarks Sync"
+    "default_title": "Bookmarks Sync",
+    "default_icon": "icon.svg"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "bookmarks-sync@mrtysn.local"
+    }
+  },
+  "icons": {
+    "48": "icon.svg",
+    "96": "icon.svg",
+    "128": "icon.svg"
   }
 }
