@@ -20,7 +20,7 @@
   height: var(--control-h);
   margin: 0;
   padding: 0 0.6rem;
-  border: 1px solid var(--cmed);
+  border: 1px solid var(--cfield);
   border-radius: 6px;
   font-size: 0.85rem;
 }
@@ -112,7 +112,7 @@
   height: 1.8rem;
   margin: 0 0 0 auto;
   padding: 0 0.5rem;
-  border: 1px solid var(--cmed);
+  border: 1px solid var(--cfield);
   border-radius: 6px;
   background: transparent;
   color: var(--cfg);
@@ -463,10 +463,13 @@ html[data-theme="light"] .bookmark-icon.fades-on-light img {
   color: var(--cdark);
 }
 
-/* classless's warn red is 2.8:1 on the dark ground; mixed toward the text
-   colour it clears 4.5:1 on both grounds and still reads as red. */
+/* A red that still reads as red and clears APCA Lc 60 as a label: light and
+   pink on the dark ground (Lc 63-66), deep on the light one (Lc 85-91). */
 .bookmarks-list .bookmark-dead {
-  color: color-mix(in srgb, #c11 45%, var(--cfg));
+  color: #ffa9a3;
+}
+html[data-theme="light"] .bookmarks-list .bookmark-dead {
+  color: #812424;
 }
 
 @media (max-width: 700px) {

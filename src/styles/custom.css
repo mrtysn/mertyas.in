@@ -14,7 +14,11 @@ html[data-theme="light"] {
   color-scheme: light;
 }
 
+/* On the dark ground #da0037 is Lc 26; the lighter red clears Lc 34 as a mark. */
 .colorHeart {
+  color: #f3314b;
+}
+html[data-theme="light"] .colorHeart {
   color: #da0037;
 }
 
@@ -125,14 +129,17 @@ a.project-card.archived[href] {
   color: var(--cfg);
 }
 
+/* A description wraps to lines, so it takes the body colour (APCA Lc 75+); the
+   name above it carries the hierarchy. */
 .card-desc {
   font-size: 0.75rem;
-  color: var(--cdark);
+  color: var(--cfg);
   line-height: 1.4;
 }
 /* Game jams — EPG timeline, jam detail, checklists */
+/* A paragraph, so body colour: --cdark was APCA Lc 69 where prose needs 75. */
 .jams-intro {
-  color: var(--cdark);
+  color: var(--cfg);
   font-size: 0.9rem;
 }
 
@@ -324,9 +331,14 @@ a.project-card.archived[href] {
   white-space: nowrap;
 }
 
+/* The red stays in the tint; the label is lifted off it: #da0037 was 2.9:1 there.
+   Dark: 7.7:1, Lc 62. Light: 4.9:1, Lc 62. */
 .jam-ai.banned {
   background: #da003722;
-  color: #da0037;
+  color: #fea1a0;
+}
+html[data-theme="light"] .jam-ai.banned {
+  color: #c40331;
 }
 
 .jam-ai.assist {
