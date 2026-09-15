@@ -57,7 +57,7 @@ function Bookmarks() {
   const bookmarksData = getAllBookmarks();
 
   // Get bookmarks for current folder
-  const { bookmarks } = useMemo(() => {
+  const { bookmarks, subfolders } = useMemo(() => {
     if (currentFolder.length === 0) {
       return {
         bookmarks: bookmarksData.flatBookmarks.filter(
@@ -175,6 +175,13 @@ function Bookmarks() {
         <BookmarksList
           bookmarks={filteredBookmarks}
           filtered={searchQuery !== '' || activeTag !== '' || statusFilter !== 'all'}
+          query={searchQuery}
+          onClearFilters={() => {
+            setSearchQuery('');
+            setActiveTag('');
+            setStatusFilter('all');
+          }}
+          hasSubfolders={subfolders.length > 0}
         />
       </div>
     </div>

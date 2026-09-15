@@ -27,6 +27,7 @@ pnpm run validate     # Run validation script
 pnpm run import:bookmarks --input <file>  # Import bookmarks (merge-based)
 pnpm run bookmarks:check                  # Check bookmark links (standalone, not in build)
 pnpm run bookmarks:previews               # Fetch OG preview images
+pnpm run bookmarks:favicons               # Copy favicons from the local Firefox profile (re-run after imports)
 pnpm run bookmarks:organize               # LLM-assisted organization (requires ANTHROPIC_API_KEY)
 pnpm run bookmarks:apply                  # Review/apply LLM suggestions
 pnpm run bookmarks:wayback                # Check Wayback Machine for dead links

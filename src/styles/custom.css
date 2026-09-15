@@ -2,6 +2,18 @@ html {
   scrollbar-gutter: stable;
 }
 
+/* The browser's scheme follows the site's theme toggle, not the OS: native
+   controls and scrollbars match the page, and favicons that switch colour with
+   prefers-color-scheme switch with the theme instead of against it. */
+:root,
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
 .colorHeart {
   color: #da0037;
 }

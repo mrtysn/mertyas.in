@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" id="y9eUYKDT" x1="33.14" y1="31.65" x2="16.89" y2="11.44" gradientTransform="scale(0.99989152, 1.0766625)">
+      <stop offset="0" stop-color="#00daab"/>
+      <stop offset="0.6280934997612081" stop-color="#15a8e5"/>
+      <stop offset="1" stop-color="#0a6fff"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" id="fgVCuIqp" x1="32.88" y1="31.57" x2="16.21" y2="10.6" gradientTransform="scale(0.99989152, 1.0766625)">
+      <stop offset="0" stop-color="#ffa84b"/>
+      <stop offset="0.5778150013514928" stop-color="#ff5252"/>
+      <stop offset="1" stop-color="#fe3f95"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" id="RIVfy5GW" x1="13.51" y1="11.74" x2="22.45" y2="34.37" gradientTransform="scale(0.99989152, 1.0766625)">
+      <stop offset="0" stop-color="#0a6fff"/>
+      <stop offset="0.4523188366588331" stop-color="#d569e7"/>
+      <stop offset="0.652049114833548" stop-color="#e462fd"/>
+      <stop offset="1" stop-color="#ff3e91"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" id="bV2PvCjG" x1="22.63" y1="33.5" x2="14.73" y2="10.38" gradientTransform="scale(0.99989152, 1.0766625)">
+      <stop offset="0" stop-color="#0a6fff"/>
+      <stop offset="0.3635292870657785" stop-color="#d569e7"/>
+      <stop offset="0.652049114833548" stop-color="#e462fd"/>
+      <stop offset="1" stop-color="#ff3e91"/>
+    </linearGradient>
+  </defs>
+  <path style="fill: none; stroke: url(&quot;#y9eUYKDT&quot;);" stroke-width="3.9974163114190104" stroke-linecap="round" stroke-linejoin="round" d="M16.17 10.73c1.89 1.37 3.75 3.36 5.75 3.36 1.75 0 4.16-2.13 6.09-3.43 2.03-1.36 4.91 0.13 4.91 2.98v21.5" transform="translate(-2.91511571, -8.13873366)"/>
+  <path style="fill: none; stroke: url(&quot;#fgVCuIqp&quot;);" stroke-width="3.9974163114190104" stroke-linecap="round" stroke-linejoin="round" d="M16.17 10.63c1.89 1.35 3.75 3.32 5.75 3.32 1.75 0 4.16-2.03 6.09-3.33 2.03-1.34 4.89 0.14 4.89 2.95v21.46" transform="translate(34.90470655, 40.03233005) rotate(180)"/>
+  <path style="fill: none; stroke: url(&quot;#RIVfy5GW&quot;);" stroke-width="3.9974163114190104" stroke-linecap="round" stroke-linejoin="round" d="M15.85 10.72c-2.33-1.76-5.67 0.36-4.92 4.12l1.41 5.25c0.99 2.6 2.3 4.01 4.91 4.01h1.34" transform="translate(-2.59313178, -8.09256118)"/>
+  <path style="fill: none; stroke: url(&quot;#bV2PvCjG&quot;);" stroke-width="3.9974163114190104" stroke-linecap="round" stroke-linejoin="round" d="M15.85 10.72c-2.33-1.76-5.67 0.36-4.92 4.12l1.41 5.25c0.99 2.6 2.3 4.01 4.91 4.01h1.34" transform="translate(34.58271956, 40.08562249) rotate(180)"/>
+</svg>

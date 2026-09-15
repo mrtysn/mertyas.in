@@ -28,7 +28,7 @@ const filterLabels: Record<StatusFilter, string> = {
 const sortLabels: Record<SortOption, string> = {
   'date-desc': 'Newest first',
   'date-asc': 'Oldest first',
-  'alpha': 'A-Z',
+  'alpha': 'A–Z',
   'recently-checked': 'Recently checked',
 };
 

@@ -41,7 +41,7 @@
   margin: 0;
   padding: 0 0.7rem;
   border: 0;
-  border-left: 1px solid var(--cmed);
+  border-inline-start: 1px solid var(--cmed);
   border-radius: 0;
   background: transparent;
   color: var(--cfg);
@@ -53,11 +53,11 @@
 }
 
 .bookmarks-filters .filter-btn:first-child {
-  border-left: 0;
+  border-inline-start: 0;
 }
 
 .filter-btn small {
-  margin-left: 0.2rem;
+  margin-inline-start: 0.2rem;
   font-variant-numeric: tabular-nums;
   color: var(--cdark);
 }
@@ -68,14 +68,19 @@
   color: var(--cfg);
 }
 
+/* Selected is marked by a bar as well as the tint, so it does not rest on
+   colour alone; an inset shadow, so the segment keeps its size. */
+/* The label keeps the text colour: the accent on its own tint is 4.49:1 in
+   the light theme, and the tint and bar already say which is selected. */
 .bookmarks-filters .filter-btn.active,
 .bookmarks-filters .filter-btn.active:not([disabled]):hover {
   background: var(--cemphbg);
-  color: var(--cemph);
+  color: var(--cfg);
+  box-shadow: inset 0 -2px 0 var(--cemph);
 }
 
 .filter-btn.active small {
-  color: var(--cemph);
+  color: var(--cfg);
 }
 
 .bookmarks-filters .filter-btn:focus-visible {
@@ -86,6 +91,11 @@
 /* Narrow screens: the control takes its own full row and the segments share
    it, tighter, so none is clipped by the rounded edge. */
 @media (max-width: 480px) {
+  /* Below 16px, iOS zooms the page when the field is focused. */
+  .bookmarks-toolbar input.bookmarks-search[type="search"] {
+    font-size: 16px;
+  }
+
   .bookmarks-filters {
     flex: 1 1 100%;
   }
@@ -277,7 +287,17 @@
   flex: 0 0 11rem;
   max-height: calc(100vh - 2rem);
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--cmed) transparent;
   font-size: 0.85rem;
+  /* Scroll shadows: a haze at an edge only while more lies past it. The two
+     page-coloured covers scroll with the content and hide each haze when that
+     end is reached. */
+  background:
+    linear-gradient(var(--cbg) 30%, transparent) top / 100% 2rem no-repeat local,
+    linear-gradient(transparent, var(--cbg) 70%) bottom / 100% 2rem no-repeat local,
+    radial-gradient(farthest-side at 50% 0, color-mix(in srgb, var(--cfg) 30%, transparent), transparent) top / 100% 0.75rem no-repeat scroll,
+    radial-gradient(farthest-side at 50% 100%, color-mix(in srgb, var(--cfg) 30%, transparent), transparent) bottom / 100% 0.75rem no-repeat scroll;
 }
 
 .bookmarks-tree,
@@ -292,7 +312,7 @@
 }
 
 .bookmarks-tree ul {
-  padding-left: 0.9rem;
+  padding-inline-start: 0.9rem;
 }
 
 /* ul.…, to outrank classless's li:not(:last-child) bottom margin. */
@@ -303,7 +323,8 @@ ul.bookmarks-tree li {
 /* a[href], to outrank classless's underline and hover recolour on links. */
 .bookmarks-tree a[href] {
   display: block;
-  padding: 0.1rem 0.4rem;
+  /* 0.2rem keeps each row at least 24px tall, the minimum target size. */
+  padding: 0.2rem 0.4rem;
   border-radius: 2px;
   color: var(--cfg);
   text-decoration: none;
@@ -323,11 +344,14 @@ ul.bookmarks-tree li {
   color: var(--cdark);
 }
 
-/* A tint as well as the colour: most folder names are emoji, which ignore
-   color. */
+/* The open folder: a tint, since most folder names are emoji that ignore
+   color, and a leading bar, so the state does not rest on colour alone. The
+   label keeps the text colour, as in the status control; an inset shadow, so
+   nothing shifts. */
 .bookmarks-tree a[href].current {
   background: var(--cemphbg);
-  color: var(--cemph);
+  color: var(--cfg);
+  box-shadow: inset 2px 0 0 var(--cemph);
 }
 
 .bookmarks-tree a[href]:focus-visible {
@@ -336,7 +360,7 @@ ul.bookmarks-tree li {
 }
 
 .bookmarks-tree a.current small {
-  color: var(--cemph);
+  color: var(--cfg);
 }
 
 @media (max-width: 700px) {
@@ -369,9 +393,21 @@ ul.bookmarks-tree li {
   color: var(--cdark);
 }
 
+.bookmarks-empty button {
+  margin: 0 0 0 0.5rem;
+  padding: 0.15rem 0.6rem;
+  border: 1px solid var(--cmed);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--cfg);
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: normal;
+}
+
 ul.bookmarks-list li {
   display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) 3rem minmax(0, 1fr);
+  grid-template-columns: 1rem minmax(0, 3fr) minmax(0, 2fr) 3rem minmax(0, 1fr);
   gap: 1rem;
   align-items: baseline;
   margin: 0;
@@ -381,6 +417,28 @@ ul.bookmarks-list li {
 
 .bookmarks-list li:hover {
   background: var(--clight);
+}
+
+.bookmark-icon {
+  display: flex;
+  align-self: center;
+}
+
+.bookmark-icon img {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 2px;
+}
+
+/* An icon measured to vanish into this theme's page — a black mark on dark, a
+   white one on light — sits on a small tile of the text colour, which is the
+   opposite of the page in either theme. Drawn with a shadow, so the row keeps
+   its size. */
+:root:not([data-theme="light"]) .bookmark-icon.fades-on-dark img,
+html[data-theme="light"] .bookmark-icon.fades-on-light img {
+  background: var(--cfg);
+  box-shadow: 0 0 0 2px var(--cfg);
 }
 
 .bookmarks-list a,
@@ -412,12 +470,25 @@ ul.bookmarks-list li {
 }
 
 @media (max-width: 700px) {
-  .bookmarks-list li {
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 0 0.75rem;
+  /* Icon, title and status on the first line; the address below the title,
+     and extra tags under that when there are any. ul.… to match the desktop
+     rule's weight. */
+  ul.bookmarks-list li {
+    grid-template-columns: 1rem minmax(0, 1fr) auto;
+    gap: 0 0.6rem;
   }
 
-  .bookmarks-list li > :nth-child(2) {
+  ul.bookmarks-list li > :nth-child(3) {
+    grid-column: 2 / -1;
     grid-row: 2;
+  }
+
+  ul.bookmarks-list li > :nth-child(4) {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  ul.bookmarks-list li > :nth-child(5) {
+    grid-column: 2 / -1;
   }
 }
