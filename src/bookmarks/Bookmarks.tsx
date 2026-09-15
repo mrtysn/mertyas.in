@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useLocation } from 'wouter';
-import { getAllBookmarks, getBookmarksByFolder } from '../utils/bookmarks';
-import BookmarksGrid from './BookmarksGrid';
+import { folderPath, folderUrl, getAllBookmarks, getBookmarksByFolder } from '../utils/bookmarks';
+import BookmarksList from './BookmarksList';
+import BookmarksTree from './BookmarksTree';
 import BookmarksToolbar from './BookmarksToolbar';
 import TagCloud from './TagCloud';
 import BookmarksStats from './BookmarksStats';
@@ -50,16 +51,13 @@ function Bookmarks() {
   const [showStats, setShowStats] = useState(false);
 
   // Derive folder path from URL params
-  const currentFolder = useMemo(() => {
-    const rest = params.rest;
-    if (!rest) return [];
-    return decodeURIComponent(rest).split('/').filter(Boolean);
-  }, [params.rest]);
+  const rest = params["*"];
+  const currentFolder = useMemo(() => folderPath(rest), [rest]);
 
   const bookmarksData = getAllBookmarks();
 
   // Get bookmarks for current folder
-  const { bookmarks, subfolders } = useMemo(() => {
+  const { bookmarks } = useMemo(() => {
     if (currentFolder.length === 0) {
       return {
         bookmarks: bookmarksData.flatBookmarks.filter(
@@ -90,6 +88,24 @@ function Bookmarks() {
     return result;
   }, [bookmarks, searchQuery, activeTag]);
 
+  // How many of what is showing fall under each status, so a filter says what it
+  // would leave before it is clicked.
+  const statusCounts = useMemo(() => {
+    const counts = {} as Record<StatusFilter, number>;
+    for (const f of ['all', 'live', 'dead', 'archived', 'unchecked'] as StatusFilter[]) {
+      counts[f] = applyStatusFilter(searchFiltered, f).length;
+    }
+    return counts;
+  }, [searchFiltered]);
+
+  // When the links were last checked. Live and dead are only as current as that.
+  const checked = useMemo(() => {
+    const times = bookmarksData.flatBookmarks
+      .map((b) => b.lastChecked)
+      .filter((t): t is number => t !== undefined);
+    return times.length ? { first: Math.min(...times), last: Math.max(...times) } : null;
+  }, [bookmarksData]);
+
   // Apply status filter
   const statusFiltered = useMemo(
     () => applyStatusFilter(searchFiltered, statusFilter),
@@ -102,12 +118,17 @@ function Bookmarks() {
     [statusFiltered, sortOption]
   );
 
+  // Opening a folder from far down a long list starts the new one at its top,
+  // placed so the sticky sidebar does not shift as the page moves.
+  const body = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const top = body.current?.getBoundingClientRect().top ?? 0;
+    const sticky = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    if (top < sticky) window.scrollBy(0, top - sticky);
+  }, [rest]);
+
   function navigateToFolder(path: string[]) {
-    if (path.length === 0) {
-      setLocation('/bookmarks');
-    } else {
-      setLocation('/bookmarks/' + path.map(encodeURIComponent).join('/'));
-    }
+    setLocation(folderUrl(path));
   }
 
   return (
@@ -124,42 +145,38 @@ function Bookmarks() {
 
       {showStats && <BookmarksStats bookmarks={bookmarksData.flatBookmarks} />}
 
-      {/* Breadcrumb navigation */}
-      <nav className="bookmarks-breadcrumb">
-        <a onClick={() => navigateToFolder([])}>All</a>
-        {currentFolder.map((folder, idx) => (
-          <span key={idx}>
-            <span> / </span>
-            <a onClick={() => navigateToFolder(currentFolder.slice(0, idx + 1))}>
-              {folder}
-            </a>
-          </span>
-        ))}
-      </nav>
-
       <BookmarksToolbar
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         totalCount={filteredBookmarks.length}
+        statusCounts={statusCounts}
+        checked={checked}
         statusFilter={statusFilter}
         onStatusFilterChange={setStatusFilter}
         sortOption={sortOption}
         onSortChange={setSortOption}
       />
 
-      <TagCloud
-        bookmarks={bookmarks}
-        onTagClick={setActiveTag}
-        activeTag={activeTag}
-      />
-
-      <BookmarksGrid
-        bookmarks={filteredBookmarks}
-        folders={subfolders}
-        onFolderClick={(folderName) =>
-          navigateToFolder([...currentFolder, folderName])
-        }
-      />
+      {/* Folders and tags beside the list rather than above it: nothing that
+          changes as you browse sits over the list, so the list never moves. */}
+      <div className="bookmarks-body" ref={body}>
+        <aside className="bookmarks-side" aria-label="Folders and tags">
+          <BookmarksTree
+            root={bookmarksData.root}
+            current={currentFolder}
+            onOpen={navigateToFolder}
+          />
+          <TagCloud
+            bookmarks={bookmarks}
+            onTagClick={setActiveTag}
+            activeTag={activeTag}
+          />
+        </aside>
+        <BookmarksList
+          bookmarks={filteredBookmarks}
+          filtered={searchQuery !== '' || activeTag !== '' || statusFilter !== 'all'}
+        />
+      </div>
     </div>
   );
 }

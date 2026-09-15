@@ -1,283 +1,175 @@
-/* Bookmarks breadcrumb navigation */
-.bookmarks-breadcrumb {
-  margin: 1rem 0;
-  font-size: 0.9rem;
-}
-
-.bookmarks-breadcrumb a {
-  cursor: pointer;
-  color: var(--link-color, #0066cc);
-  text-decoration: none;
-}
-
-.bookmarks-breadcrumb a:hover {
-  text-decoration: underline;
-}
-
-/* Toolbar */
+/* Toolbar: every control one height, one border, one radius */
 .bookmarks-toolbar {
+  --control-h: 2rem;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 0.75rem;
   flex-wrap: wrap;
 }
 
-.bookmarks-search {
-  flex: 1;
-  max-width: 400px;
-  padding: 0.5rem;
-  border: 1px solid var(--border-color, #ddd);
-  border-radius: 4px;
-}
-
-.bookmarks-count {
-  color: var(--text-muted, #666);
-}
-
-/* Grid layout */
-.bookmarks-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-/* Bookmark card */
-.bookmark-card {
-  border: 1px solid var(--border-color, #ddd);
-  border-radius: 8px;
-  overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-}
-
-.bookmark-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.bookmark-card a {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  text-decoration: none;
-  color: inherit;
-  width: 100%;
-}
-
-/* Favicon display */
-.bookmark-favicon {
-  width: 48px;
-  height: 48px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-secondary, #f5f5f5);
-  border-radius: 4px;
-}
-
-.bookmark-favicon img {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
-}
-
-.bookmark-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: var(--text-muted, #666);
-}
-
-/* Bookmark info */
-.bookmark-info {
-  flex: 1;
+/* classless gives inputs full width, a bottom margin and a thicker border, and
+   loads after this file, so the override has to outrank input:not():not(). */
+.bookmarks-toolbar input.bookmarks-search[type="search"] {
+  /* A set width, not a share of what is left: the status control's width moves
+     with its counts, and the search box must not move with it. */
+  flex: 0 1 16rem;
+  /* An input's automatic minimum is its intrinsic width, which kept the basis
+     from ever applying. */
   min-width: 0;
-}
-
-.bookmark-info h3 {
-  margin: 0 0 0.25rem 0;
-  font-size: 1rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.bookmark-url {
-  color: var(--text-muted, #666);
+  width: auto;
+  height: var(--control-h);
+  margin: 0;
+  padding: 0 0.6rem;
+  border: 1px solid var(--cmed);
+  border-radius: 6px;
   font-size: 0.85rem;
 }
 
-/* Status badges */
-.status {
-  font-size: 0.75rem;
-  padding: 0.125rem 0.5rem;
-  border-radius: 4px;
-  margin-left: 0.5rem;
-  display: inline-block;
-}
-
-.status-success {
-  background: #d4edda;
-  color: #155724;
-}
-
-.status-redirect {
-  background: #fff3cd;
-  color: #856404;
-}
-
-.status-client-error {
-  background: #f8d7da;
-  color: #721c24;
-}
-
-.status-server-error {
-  background: #f5c6cb;
-  color: #721c24;
-}
-
-.status-unknown {
-  background: #e2e3e5;
-  color: #383d41;
-}
-
-.status-archived {
-  background: #cce5ff;
-  color: #004085;
-}
-
-/* Filter buttons */
+/* Status filter: one segmented control. Each segment carries its count, so it
+   says what it would leave before it is clicked. */
 .bookmarks-filters {
-  display: flex;
-  gap: 0.25rem;
-  flex-wrap: wrap;
+  display: inline-flex;
+  height: var(--control-h);
+  border: 1px solid var(--cmed);
+  border-radius: 6px;
+  overflow: hidden;
 }
 
-.filter-btn {
-  font-size: 0.8rem;
-  padding: 0.25rem 0.6rem;
-  border: 1px solid var(--border-color, #ddd);
-  border-radius: 4px;
+/* classless sets weight, spacing, margin, border and a hover recolour on every
+   button; each is set back here, the hover with enough weight to win. */
+.bookmarks-filters .filter-btn {
+  margin: 0;
+  padding: 0 0.7rem;
+  border: 0;
+  border-left: 1px solid var(--cmed);
+  border-radius: 0;
   background: transparent;
+  color: var(--cfg);
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: normal;
   cursor: pointer;
-  color: var(--text-muted, #666);
-  transition: background 0.15s, color 0.15s;
+  transition: background-color 0.15s, color 0.15s;
 }
 
-.filter-btn:hover {
-  background: var(--bg-secondary, #f5f5f5);
+.bookmarks-filters .filter-btn:first-child {
+  border-left: 0;
 }
 
-.filter-btn.active {
-  background: var(--link-color, #0066cc);
-  color: #fff;
-  border-color: var(--link-color, #0066cc);
+.filter-btn small {
+  margin-left: 0.2rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--cdark);
 }
 
-/* Tags */
-.bookmark-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-  margin-top: 0.5rem;
+.bookmarks-filters .filter-btn:not([disabled]):hover {
+  filter: none;
+  background: var(--clight);
+  color: var(--cfg);
 }
 
-.tag {
-  font-size: 0.75rem;
-  padding: 0.125rem 0.5rem;
-  background: var(--bg-secondary, #f5f5f5);
-  border-radius: 4px;
-  color: var(--text-muted, #666);
+.bookmarks-filters .filter-btn.active,
+.bookmarks-filters .filter-btn.active:not([disabled]):hover {
+  background: var(--cemphbg);
+  color: var(--cemph);
 }
 
-/* Folder card */
-.folder-card {
-  border: 1px solid var(--border-color, #ddd);
-  border-radius: 8px;
-  overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  background: var(--bg-secondary, #f5f5f5);
+.filter-btn.active small {
+  color: var(--cemph);
 }
 
-.folder-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.bookmarks-filters .filter-btn:focus-visible {
+  outline: 2px solid var(--clink);
+  outline-offset: -2px;
 }
 
-.folder-icon {
-  font-size: 2rem;
-  flex-shrink: 0;
-}
+/* Narrow screens: the control takes its own full row and the segments share
+   it, tighter, so none is clipped by the rounded edge. */
+@media (max-width: 480px) {
+  .bookmarks-filters {
+    flex: 1 1 100%;
+  }
 
-.folder-info {
-  flex: 1;
-  min-width: 0;
-}
+  .bookmarks-filters .filter-btn {
+    flex: 1 1 auto;
+    padding: 0 0.3rem;
+  }
 
-.folder-info h3 {
-  margin: 0 0 0.25rem 0;
-  font-size: 1rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.folder-info small {
-  color: var(--text-muted, #666);
 }
 
 /* Sort select */
-.bookmarks-sort {
-  padding: 0.25rem 0.5rem;
-  border: 1px solid var(--border-color, #ddd);
-  border-radius: 4px;
-  font-size: 0.85rem;
+.bookmarks-meta .bookmarks-sort {
+  height: 1.8rem;
+  margin: 0 0 0 auto;
+  padding: 0 0.5rem;
+  border: 1px solid var(--cmed);
+  border-radius: 6px;
   background: transparent;
-  color: inherit;
+  color: var(--cfg);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+/* classless removes the outline from every select and puts nothing back. */
+.bookmarks-meta .bookmarks-sort:focus-visible {
+  outline: 2px solid var(--clink);
+  outline-offset: 1px;
+}
+
+/* Count and the date of the last link check — live and dead are only as
+   current as that — with the sort at the far end, above the list. */
+.bookmarks-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin: 0.6rem 0 0.8rem;
+}
+
+.bookmarks-meta p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--cdark);
 }
 
 /* Bookmarks header */
+/* Baseline, not centre: the heading's box is mostly margin. Its top margin
+   cannot collapse out of a flex container, so it is dropped here to sit where
+   headings sit on every other page. */
 .bookmarks-header {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
 }
 
-.stats-toggle {
-  font-size: 0.85rem;
-  padding: 0.25rem 0.75rem;
-  border: 1px solid var(--border-color, #ddd);
-  border-radius: 4px;
-  background: transparent;
-  cursor: pointer;
-  color: var(--text-muted, #666);
+.bookmarks-header > h2 {
+  margin-top: 0;
 }
 
-.stats-toggle:hover {
-  background: var(--bg-secondary, #f5f5f5);
+.bookmarks-header .stats-toggle {
+  margin: 0;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--cmed);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--cfg);
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: normal;
+  cursor: pointer;
+}
+
+.bookmarks-header .stats-toggle:not([disabled]):hover {
+  filter: none;
+  background: var(--clight);
+  color: var(--cfg);
 }
 
 /* Stats dashboard */
 .bookmarks-stats {
   margin-bottom: 1rem;
   padding: 1rem;
-  border: 1px solid var(--border-color, #ddd);
+  border: 1px solid var(--cmed);
   border-radius: 8px;
 }
 
@@ -300,13 +192,16 @@
 
 .stat-label {
   font-size: 0.8rem;
-  color: var(--text-muted, #666);
+  color: var(--cdark);
 }
 
-.stat-live { color: #155724; }
-.stat-dead { color: #721c24; }
-.stat-archived { color: #004085; }
-.stat-unchecked { color: #383d41; }
+/* Dark text on the light theme only; on dark they vanished. The palette for
+   three, and for dead classless's .warn red mixed toward the text colour, which
+   is what clears contrast on both grounds. */
+.stat-live { color: var(--cemph); }
+.stat-dead { color: color-mix(in srgb, #c11 45%, var(--cfg)); }
+.stat-archived { color: var(--clink); }
+.stat-unchecked { color: var(--cdark); }
 
 .stats-domains {
   margin-top: 1rem;
@@ -315,7 +210,7 @@
 
 .stats-domains summary {
   cursor: pointer;
-  color: var(--text-muted, #666);
+  color: var(--cdark);
 }
 
 .stats-domains ul {
@@ -331,110 +226,198 @@
 }
 
 .domain-count {
-  color: var(--text-muted, #666);
+  color: var(--cdark);
   font-variant-numeric: tabular-nums;
 }
 
 /* Tag cloud */
+/* Sizes vary with use; baseline keeps a small tag from stretching to the
+   height of the largest one in its row. */
 .tag-cloud {
   display: flex;
   flex-wrap: wrap;
+  align-items: baseline;
   gap: 0.4rem;
   margin-bottom: 1rem;
 }
 
 .tag-cloud-item {
-  background: var(--bg-secondary, #f5f5f5);
+  background: var(--clight);
   border: 1px solid transparent;
   border-radius: 4px;
   padding: 0.15rem 0.5rem;
   cursor: pointer;
-  color: var(--text-muted, #666);
+  color: var(--cdark);
   transition: background 0.15s, border-color 0.15s;
 }
 
 .tag-cloud-item:hover {
-  border-color: var(--border-color, #ddd);
+  border-color: var(--cmed);
 }
 
 .tag-cloud-item.active {
-  background: var(--link-color, #0066cc);
-  color: #fff;
+  background: var(--clink);
+  color: var(--cbg);
 }
 
-/* OG preview image */
-.bookmark-card.has-preview {
-  flex-direction: column;
-  align-items: stretch;
-}
-
-.bookmark-card.has-preview > a {
-  align-items: center;
-}
-
-.bookmark-preview {
-  width: 100%;
-  height: 140px;
-  overflow: hidden;
-  border-radius: 4px;
-  margin-bottom: 0.5rem;
-}
-
-.bookmark-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Bookmark expand / detail view */
-.bookmark-card {
-  position: relative;
-}
-
-.bookmark-expand-btn {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 0.7rem;
-  color: var(--text-muted, #666);
-  padding: 0.25rem;
-  line-height: 1;
-}
-
-.bookmark-card.expanded {
-  grid-column: 1 / -1;
-}
-
-.bookmark-details {
-  padding: 0.75rem 1rem 0;
-  border-top: 1px solid var(--border-color, #ddd);
-  margin-top: 0.75rem;
-}
-
-.detail-row {
+/* Body: the sidebar and the list side by side, as on the jams page */
+.bookmarks-body {
   display: flex;
-  gap: 0.75rem;
-  padding: 0.25rem 0;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+/* classless treats main > aside as a margin note — absolute, off to the right,
+   and hidden below 70rem — so each of those is set back here. */
+.bookmarks-side {
+  display: block;
+  right: auto;
+  position: sticky;
+  top: 1rem;
+  flex: 0 0 11rem;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
   font-size: 0.85rem;
 }
 
-.detail-label {
-  color: var(--text-muted, #666);
-  min-width: 80px;
-  flex-shrink: 0;
+.bookmarks-tree,
+.bookmarks-tree ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.detail-value {
-  flex: 1;
+.bookmarks-tree {
+  margin-bottom: 1rem;
+}
+
+.bookmarks-tree ul {
+  padding-left: 0.9rem;
+}
+
+/* ul.…, to outrank classless's li:not(:last-child) bottom margin. */
+ul.bookmarks-tree li {
+  margin: 0;
+}
+
+/* a[href], to outrank classless's underline and hover recolour on links. */
+.bookmarks-tree a[href] {
+  display: block;
+  padding: 0.1rem 0.4rem;
+  border-radius: 2px;
+  color: var(--cfg);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.bookmarks-tree a[href]:hover {
+  filter: none;
+  background: var(--clight);
+  color: var(--cfg);
+}
+
+.bookmarks-tree small {
+  color: var(--cdark);
+}
+
+/* A tint as well as the colour: most folder names are emoji, which ignore
+   color. */
+.bookmarks-tree a[href].current {
+  background: var(--cemphbg);
+  color: var(--cemph);
+}
+
+.bookmarks-tree a[href]:focus-visible {
+  outline: 2px solid var(--clink);
+  outline-offset: -2px;
+}
+
+.bookmarks-tree a.current small {
+  color: var(--cemph);
+}
+
+@media (max-width: 700px) {
+  .bookmarks-body {
+    flex-direction: column;
+  }
+
+  /* Stacked above the list, a tree that grew as it unfolded would push the
+     list down; a fixed height with its own scroll keeps the list still. */
+  .bookmarks-side {
+    position: static;
+    flex: none;
+    width: 100%;
+    height: 14rem;
+    max-height: none;
+  }
+}
+
+/* The list: one line per bookmark — title, address, status, extra tags */
+.bookmarks-list {
+  flex: 1 1 auto;
   min-width: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.88rem;
 }
 
-.detail-url {
+.bookmarks-empty {
+  color: var(--cdark);
+}
+
+ul.bookmarks-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) 3rem minmax(0, 1fr);
+  gap: 1rem;
+  align-items: baseline;
+  margin: 0;
+  padding: 0.2rem 0.4rem;
+  border-bottom: 1px solid var(--clight);
+}
+
+.bookmarks-list li:hover {
+  background: var(--clight);
+}
+
+.bookmarks-list a,
+.bookmarks-list small {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  display: block;
+}
+
+/* a[href], to outrank classless's underline on every link. */
+.bookmarks-list a[href] {
+  color: var(--cfg);
+  text-decoration: none;
+}
+
+.bookmarks-list a[href]:hover {
+  color: var(--clink);
+  text-decoration: underline;
+}
+
+.bookmarks-list small {
+  color: var(--cdark);
+}
+
+/* classless's warn red is 2.8:1 on the dark ground; mixed toward the text
+   colour it clears 4.5:1 on both grounds and still reads as red. */
+.bookmarks-list .bookmark-dead {
+  color: color-mix(in srgb, #c11 45%, var(--cfg));
+}
+
+@media (max-width: 700px) {
+  .bookmarks-list li {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0 0.75rem;
+  }
+
+  .bookmarks-list li > :nth-child(2) {
+    grid-row: 2;
+  }
 }

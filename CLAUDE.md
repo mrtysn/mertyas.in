@@ -43,12 +43,12 @@ pnpm run bookmarks:curate                 # Interactive Claude Code session for 
 ├── src/
 │   ├── App.tsx           # Main app component
 │   ├── main.tsx          # Entry point
-│   ├── routes.tsx        # Route definitions (includes /bookmarks/:rest* wildcard)
+│   ├── routes.tsx        # Route definitions (includes the /bookmarks/*? wildcard)
 │   ├── components/       # Reusable components
 │   ├── home/             # Home page
 │   ├── posts/            # Blog posts
 │   ├── projects/         # Projects section
-│   ├── bookmarks/        # Bookmarks UI (Bookmarks, BookmarkCard, TagCloud, BookmarksStats, etc.)
+│   ├── bookmarks/        # Bookmarks UI (Bookmarks, BookmarksList, TagCloud, BookmarksStats, etc.)
 │   ├── styles/           # CSS styles
 │   └── utils/            # Utility functions (types.ts has v2 data model)
 ├── scripts/

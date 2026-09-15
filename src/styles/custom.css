@@ -160,6 +160,8 @@ article code {
 .epg-scroll {
   flex: 1 1 auto;
   overflow-x: auto;
+  /* The native track is light whatever the theme. */
+  scrollbar-color: var(--cmed) transparent;
 }
 
 .epg-inner {
@@ -257,6 +259,16 @@ article code {
   border-radius: 6px;
 }
 
+/* Inside a bordered card the heading's top margin is only an empty band, and
+   classless's section ornament is decoration without information. */
+.jam-detail > h3:first-child {
+  margin-top: 0;
+}
+
+.jam-detail::after {
+  content: none;
+}
+
 .jam-facts {
   display: grid;
   grid-template-columns: 6rem 1fr;
@@ -324,6 +336,15 @@ article code {
   cursor: pointer;
 }
 
+/* Top-aligned for tasks that wrap, so the box is nudged down to the middle of
+   the first line instead of sitting on its top edge. */
+.jam-checklist input {
+  flex: none;
+  width: 1em;
+  height: 1em;
+  margin: calc((1lh - 1em) / 2) 0 0;
+}
+
 .jam-checklist label.done {
   color: var(--cdark);
   text-decoration: line-through;
@@ -353,7 +374,14 @@ article code {
   margin-top: 1.5rem;
 }
 
+/* classless paints every <nav> as the site bar — a background that also hid
+   the links' hover — and pushes whatever follows it 3rem down. */
+.jams-nav + * {
+  margin-top: 0;
+}
+
 .jams-nav {
+  background: none;
   position: sticky;
   top: 1rem;
   flex: 0 0 11rem;

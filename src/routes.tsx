@@ -31,11 +31,11 @@ export const routes: RouteProps[] = [
     component: Projects,
   },
   {
-    path: "/bookmarks",
-    component: Bookmarks,
-  },
-  {
-    path: "/bookmarks/:rest*",
+    // One route for the root and every folder, so moving between them keeps
+    // the page mounted — its search, filters and unfolded tree. "*?" is an
+    // optional wildcard; ":rest*" is not one to wouter's regexparam, which
+    // reads it as a single segment under a key literally named "rest*".
+    path: "/bookmarks/*?",
     component: Bookmarks,
   },
   {

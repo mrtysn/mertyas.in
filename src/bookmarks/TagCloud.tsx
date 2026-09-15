@@ -7,10 +7,13 @@ interface TagCloudProps {
 }
 
 function TagCloud({ bookmarks, onTagClick, activeTag }: TagCloudProps) {
-  // Count tag frequencies
+  // Count tag frequencies. A tag that only repeats the bookmark's own folder
+  // is already the folder line above; counting it made one folder name dwarf
+  // every real tag.
   const tagCounts = new Map<string, number>();
   for (const b of bookmarks) {
     for (const tag of b.tags) {
+      if (b.folderPath.includes(tag)) continue;
       tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
     }
   }
@@ -28,7 +31,7 @@ function TagCloud({ bookmarks, onTagClick, activeTag }: TagCloudProps) {
   function getSize(count: number): string {
     if (maxCount === minCount) return '1rem';
     const ratio = (count - minCount) / (maxCount - minCount);
-    const size = 0.75 + ratio * 0.75;
+    const size = 0.75 + ratio * 0.35;
     return `${size}rem`;
   }
 
