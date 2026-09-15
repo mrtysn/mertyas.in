@@ -57,33 +57,51 @@ article code {
   align-items: center;
   padding: 0.75rem 1rem;
   border-radius: 6px;
-  border-left: 3px solid transparent;
-  transition: background 0.15s, transform 0.15s;
+  border-inline-start: 3px solid transparent;
 }
 
-.project-card.linked {
-  border-left-color: var(--cemph);
-}
-
-.project-card:hover {
-  background: var(--clight);
-  transform: translateY(-1px);
-}
-
-.project-card.archived {
-  opacity: 0.5;
-}
-
-.project-card.archived:hover {
-  opacity: 0.7;
-}
-
-.project-card a {
-  text-decoration: none;
+/* A linked card is the <a>. a[href], to outrank classless's underline and
+   hover recolour, which drew lines under the name, description and icon. */
+a.project-card[href] {
+  border-inline-start-color: var(--cemph);
   color: inherit;
-  display: flex;
-  align-items: center;
-  width: 100%;
+  text-decoration: none;
+  transition: background-color 0.15s, transform 0.15s;
+}
+
+/* Only links respond to the pointer; a card that goes nowhere does not. */
+a.project-card[href]:hover {
+  filter: none;
+  background: var(--clight);
+  color: inherit;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a.project-card[href]:hover {
+    transform: translateY(-1px);
+  }
+}
+
+a.project-card[href]:focus-visible {
+  outline: 2px solid var(--clink);
+  outline-offset: 2px;
+}
+
+/* Archived: present but quiet. The icon fades and the name drops to the
+   secondary colour; the text is not dimmed further, since card-wide opacity
+   left it at 2.4:1. A public archived project keeps its border, but neutral:
+   no accent. */
+.project-card.archived .card-icon {
+  opacity: 0.45;
+  filter: grayscale(1);
+}
+
+.project-card.archived .card-name {
+  color: var(--cdark);
+}
+
+a.project-card.archived[href] {
+  border-inline-start-color: var(--cmed);
 }
 
 .card-icon {
@@ -97,7 +115,7 @@ article code {
 .card-body {
   display: flex;
   flex-direction: column;
-  margin-left: 0.75rem;
+  margin-inline-start: 0.75rem;
   min-width: 0;
 }
 
