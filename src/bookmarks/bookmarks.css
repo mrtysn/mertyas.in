@@ -7,12 +7,27 @@
   flex-wrap: wrap;
 }
 
+/* The label rides with the field it names. A set width, not a share of what is
+   left: the status control's width moves with its counts, and the search box
+   must not move with it. */
+.bookmarks-search-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 0 1 19rem;
+  min-width: 0;
+}
+
+.bookmarks-search-field label {
+  color: var(--cdark);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
 /* classless gives inputs full width, a bottom margin and a thicker border, and
    loads after this file, so the override has to outrank input:not():not(). */
 .bookmarks-toolbar input.bookmarks-search[type="search"] {
-  /* A set width, not a share of what is left: the status control's width moves
-     with its counts, and the search box must not move with it. */
-  flex: 0 1 16rem;
+  flex: 1 1 auto;
   /* An input's automatic minimum is its intrinsic width, which kept the basis
      from ever applying. */
   min-width: 0;

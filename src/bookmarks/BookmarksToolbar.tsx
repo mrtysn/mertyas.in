@@ -51,14 +51,20 @@ function BookmarksToolbar({
   return (
     <>
       <div className="bookmarks-toolbar">
-        <input
-          type="search"
-          placeholder="Search bookmarks…"
-          aria-label="Search bookmarks"
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="bookmarks-search"
-        />
+        {/* A visible label, because the placeholder was the only thing naming
+            this field and it leaves as soon as anything is typed. The
+            placeholder now shows what may be typed instead of repeating it. */}
+        <div className="bookmarks-search-field">
+          <label htmlFor="bookmarks-search">Search</label>
+          <input
+            id="bookmarks-search"
+            type="search"
+            placeholder="title, address or tag"
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="bookmarks-search"
+          />
+        </div>
         {/* Status last: its width follows the counts, and with nothing after
             it a folder change moves no other control. */}
         <div className="bookmarks-filters" role="group" aria-label="Link status">
