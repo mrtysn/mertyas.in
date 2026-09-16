@@ -317,7 +317,6 @@ a.project-card.archived[href] {
   position: relative;
   height: 35px;
   border-bottom: 1px solid var(--cmed);
-  cursor: pointer;
 }
 
 .epg-window {
@@ -480,8 +479,21 @@ html[data-theme="light"] .jam-ai.banned {
   font-size: 0.88rem;
 }
 
-.jams-schedule tbody tr {
-  cursor: pointer;
+/* The name carries the jump, so it looks like what it is; the row no longer
+   claims a click the keyboard could not make. */
+.jams-schedule .jams-jump {
+  color: inherit;
+  /* classless clears underlines from links, which left the name looking like the
+     plain text it used to be. A quiet rule says it can be clicked. */
+  text-decoration: underline;
+  text-decoration-color: var(--cmed);
+  text-decoration-thickness: from-font;
+  text-underline-offset: 2px;
+}
+
+.jams-schedule .jams-jump:hover {
+  color: var(--clink);
+  text-decoration-color: currentColor;
 }
 
 

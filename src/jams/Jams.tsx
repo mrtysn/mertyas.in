@@ -185,8 +185,21 @@ function Jams() {
         </thead>
         <tbody>
           {schedule.map((row) => (
-            <tr key={row.key} onClick={() => goTo(entryIdFor(row.key))}>
-              <td>{row.name}</td>
+            <tr key={row.key}>
+              {/* The jam's name is the control. The row itself used to take the
+                  click, which no keyboard could reach and nothing announced. */}
+              <td>
+                <a
+                  className="jams-jump"
+                  href={`#${entryIdFor(row.key)}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    goTo(entryIdFor(row.key));
+                  }}
+                >
+                  {row.name}
+                </a>
+              </td>
               <td>{row.build}</td>
               <td>{fmt(row.end)}</td>
               <td className="jams-left">{countdown(row.end, now)}</td>

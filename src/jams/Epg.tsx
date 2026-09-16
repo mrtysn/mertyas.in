@@ -156,12 +156,11 @@ function Epg({ onSelect }: EpgProps) {
               </div>
             </div>
 
+            {/* A row is a picture of the jam's window; the control is the label
+                button beside it, which the keyboard can reach. A click on the row
+                itself used to select the jam, with nothing announcing it. */}
             {model.rows.map(({ jam, left, width, sprints }) => (
-              <div
-                key={jam.key}
-                className="epg-row"
-                onClick={() => onSelect(jam.key)}
-              >
+              <div key={jam.key} className="epg-row">
                 <div
                   className="epg-window"
                   style={{ left: `${left}px`, width: `${width}px` }}
