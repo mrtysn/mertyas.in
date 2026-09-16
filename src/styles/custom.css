@@ -33,6 +33,44 @@ html[data-theme="light"] .colorHeart {
   user-select: none;
 }
 
+/* The theme switch is a control that goes nowhere, so it is a <button>. classless
+   dresses buttons in a border, bold text and letter-spacing; here it is the glyph
+   alone. The negative margin matches the padding, so the nav row keeps its height. */
+.theme-toggle {
+  position: relative;
+  display: inline-block;
+  margin: -0.25rem;
+  padding: 0.25rem;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1;
+}
+
+/* The pressable area is larger than the glyph, but the hover tint is not: paint
+   spilling past the bar is what a background on the full target area looked like.
+   The tint stays the button; the target is this, and it stops inside the bar. */
+.theme-toggle::after {
+  content: "";
+  position: absolute;
+  /* Less to the sides than above and below, so the target stops short of the
+     bar's own edge instead of hanging off it. */
+  inset: -0.5rem -0.3rem;
+}
+
+.theme-toggle:not([disabled]):hover {
+  filter: none;
+  background: var(--clight);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--clink);
+  outline-offset: 2px;
+}
+
 /* Markdown content styles */
 article img {
   max-width: 100%;

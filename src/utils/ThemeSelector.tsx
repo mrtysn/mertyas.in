@@ -53,7 +53,22 @@ function ThemeSelector() {
     return currentTheme === themes.light ? "🌞" : "🌚"; // Choose emojis based on theme
   };
 
-  return <a onClick={toggleTheme}>{getEmoji()}</a>;
+  // A button, not a link: it goes nowhere, and an <a> without href takes no
+  // focus, so the keyboard could not reach the switch at all.
+  return (
+    <button
+      type="button"
+      className="theme-toggle"
+      onClick={toggleTheme}
+      aria-label={
+        currentTheme === themes.light
+          ? "Switch to the dark theme"
+          : "Switch to the light theme"
+      }
+    >
+      {getEmoji()}
+    </button>
+  );
 }
 
 export default ThemeSelector;
