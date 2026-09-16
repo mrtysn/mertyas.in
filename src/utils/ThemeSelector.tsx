@@ -3,8 +3,21 @@ import { useState, useEffect } from "react";
 const themes = { light: "light", dark: "dark" };
 const THEME_KEY = "theme";
 
+/*
+  A theme flip changes colour on nearly every element at once. Anything carrying
+  a colour transition — the bookmark status filters — would otherwise arrive
+  150ms after the rest of the page had already changed, so the switch smears
+  instead of snapping. Transitions are suppressed for the frame that applies it:
+  add the rule, force a reflow so it is in effect, drop it on the next frame.
+*/
 function setTheme(theme: string) {
-  document.documentElement.setAttribute("data-theme", theme);
+  const root = document.documentElement;
+  const halt = document.createElement("style");
+  halt.textContent = "*,*::before,*::after{transition:none !important}";
+  document.head.appendChild(halt);
+  root.setAttribute("data-theme", theme);
+  void root.offsetHeight;
+  requestAnimationFrame(() => halt.remove());
 }
 
 const getInitialTheme = () => {
