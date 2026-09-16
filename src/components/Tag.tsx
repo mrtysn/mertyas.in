@@ -13,7 +13,7 @@ function Tag() {
 
   return (
     <div>
-      <h2>Posts tagged "{tag}"</h2>
+      <h1 className="page-title">Posts tagged "{tag}"</h1>
       {posts.length === 0 ? (
         <p>No posts found with this tag.</p>
       ) : (

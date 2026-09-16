@@ -6,7 +6,7 @@ function Posts() {
 
   return (
     <div>
-      <h2>Posts</h2>
+      <h1 className="page-title">Posts</h1>
       {posts.length === 0 ? (
         <p>No posts yet.</p>
       ) : (

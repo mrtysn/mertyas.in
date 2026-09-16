@@ -6,7 +6,7 @@ function Tags() {
 
   return (
     <div>
-      <h2>Tags</h2>
+      <h1 className="page-title">Tags</h1>
       {tags.length === 0 ? (
         <p>No tags yet.</p>
       ) : (

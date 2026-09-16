@@ -166,7 +166,7 @@ function Jams() {
 
   return (
     <div className="jams">
-      <h2>Game jams</h2>
+      <h1 className="page-title">Game jams</h1>
 
       <p className="jams-authority">
         <strong>Only the dates are authoritative.</strong> Everything else is a
@@ -227,7 +227,7 @@ function Jams() {
         <div className="jams-sections">
           {entries.map((entry) => (
             <section key={entry.id} id={entry.id} className="jam-detail">
-              <h3>{entry.label}</h3>
+              <h2 className="jam-entry-title">{entry.label}</h2>
 
               {entry.sprints.map((sprint) => {
                 const done = sprint.tasks.filter(
@@ -235,13 +235,13 @@ function Jams() {
                 ).length;
                 return (
                   <div key={sprint.key}>
-                    <h4>
+                    <h3 className="jam-sprint-title">
                       {sprint.label}{" "}
                       <span className="jam-sprint-meta">
                         {fmtDay(sprint.start)} → {fmtDay(sprint.end)} · {done}/
                         {sprint.tasks.length}
                       </span>
-                    </h4>
+                    </h3>
                     <ul className="jam-checklist">
                       {sprint.tasks.map((task) => {
                         const id = `${sprint.key}:${task}`;
@@ -265,12 +265,12 @@ function Jams() {
 
               {entry.jams.map((jam) => (
                 <div key={jam.key} className="jam-rules">
-                  <h4>
+                  <h3 className="jam-sprint-title">
                     <a href={jam.url} target="_blank" rel="noopener noreferrer">
                       {jam.name}
                     </a>{" "}
                     <span className="jam-sprint-meta">the rules</span>
-                  </h4>
+                  </h3>
 
                   <dl className="jam-facts">
                     <dt>Window</dt>
@@ -307,7 +307,7 @@ function Jams() {
           ))}
 
           <section id="brackeys-themes">
-            <h3>Brackeys theme patterns</h3>
+            <h2 className="jam-entry-title">Brackeys theme patterns</h2>
             <ul className="jam-constraints">
               {BRACKEYS_PATTERNS.map((p) => (
                 <li key={p}>{p}</li>

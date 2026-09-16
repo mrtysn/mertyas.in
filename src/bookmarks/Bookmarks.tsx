@@ -134,7 +134,7 @@ function Bookmarks() {
   return (
     <div>
       <div className="bookmarks-header">
-        <h2>Bookmarks</h2>
+        <h1 className="page-title">Bookmarks</h1>
         <button
           className="stats-toggle"
           onClick={() => setShowStats(!showStats)}

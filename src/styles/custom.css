@@ -26,6 +26,44 @@ html[data-theme="light"] .colorHeart {
   min-height: 20rem;
 }
 
+/* Every page names itself with an h1, one level per step below it. The levels
+   changed, the look did not: each of these keeps the size and weight the
+   heading had before, so the outline is what moved, not the page. */
+.page-title {
+  font-size: 2em;
+  font-weight: 300;
+  font-variant: small-caps;
+}
+
+.jam-entry-title {
+  font-size: 1.5em;
+  font-weight: 400;
+  font-variant: normal;
+}
+
+.jam-sprint-title {
+  font-size: 1.1em;
+  font-weight: 700;
+}
+
+/* The keyboard's way past the nav: out of sight until it takes focus, and a
+   real control once it has. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 50;
+}
+
+.skip-link:focus {
+  left: 0.5rem;
+  top: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  background: var(--clight);
+  border: 1px solid var(--cfield);
+  border-radius: 6px;
+}
+
 .no-select {
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -336,7 +374,7 @@ a.project-card.archived[href] {
 
 /* Inside a bordered card the heading's top margin is only an empty band, and
    classless's section ornament is decoration without information. */
-.jam-detail > h3:first-child {
+.jam-detail > h2:first-child {
   margin-top: 0;
 }
 

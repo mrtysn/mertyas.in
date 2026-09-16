@@ -66,7 +66,7 @@ function Card({ project }: { project: Project }) {
 function Projects() {
   return (
     <div>
-      <h2>Projects</h2>
+      <h1 className="page-title">Projects</h1>
       <div className="projects-grid">
         {projects.map((project) => (
           <Card key={project.name} project={project} />

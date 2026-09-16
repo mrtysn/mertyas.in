@@ -6,9 +6,15 @@ import { routes } from "./routes";
 
 function App() {
   return (
-    <main>
+    <>
+      {/* First stop for the keyboard, so the nav can be jumped over. */}
+      <a className="skip-link" href="#content">
+        Skip to content
+      </a>
       <Header />
-      <div className="content">
+      {/* The nav and the footer sit outside <main>, so "main" is this page's own
+          content and a screen reader can jump straight to it. */}
+      <main id="content" className="content">
         {/*
           Switch renders only the first match. Without it every <Route> matches
           independently, so /jams, /projects and /posts each rendered their own
@@ -21,9 +27,9 @@ function App() {
             <Route key={index} path={route.path} component={route.component} />
           ))}
         </Switch>
-      </div>
+      </main>
       <Footer />
-    </main>
+    </>
   );
 }
 

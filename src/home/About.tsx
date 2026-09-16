@@ -36,7 +36,7 @@ const AboutWebsite = () => (
 
 const AboutAuthor = ({ experience }: { experience: number }) => (
   <>
-    <h2 className="mb-1">About</h2>
+    <h1 className="mb-1 page-title">About</h1>
     <p>
       Mert is a <span className="text-primary">Senior Software Engineer</span>{" "}
       with {experience + snapshotExperience}+

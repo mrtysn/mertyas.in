@@ -28,7 +28,7 @@ function Post() {
   if (!post) {
     return (
       <div>
-        <h2>Post not found</h2>
+        <h1 className="page-title">Post not found</h1>
         <p>
           <Link href="/posts">← Back to all posts</Link>
         </p>
