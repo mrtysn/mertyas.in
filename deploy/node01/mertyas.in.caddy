@@ -1,0 +1,7 @@
+# mertyas.in → mertyas.in. Lives in the shared Caddy's sites/ on the box; this file is the
+# tracked copy (project-lifecycle -C deploy/node01 deploy installs it when it differs).
+# Public: the personal site, no portal login.
+mertyas.in {
+    encode gzip
+    reverse_proxy mertyas-in:80
+}

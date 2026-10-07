@@ -1,0 +1,30 @@
+{
+  "kind": "docker-service",
+  "name": "mertyas.in",
+  "tool": "mertyas-in",
+  "test": [
+    {"name": "web-shared present", "run": ["test", "-f", "{repo}/../../web-shared/src/styles/classless.css"]},
+    {"name": "lint", "run": ["pnpm", "--dir", "{repo}/../..", "lint"]},
+    {"name": "typecheck", "run": ["pnpm", "--dir", "{repo}/../..", "exec", "tsc", "--noEmit", "-p", "tsconfig.app.json"]},
+    {"name": "build", "run": ["pnpm", "--dir", "{repo}/../..", "build"]}
+  ],
+  "docker_service": {
+    "source": "../..",
+    "dir": "/opt/mertyas-in",
+    "compose": "docker-compose.yml",
+    "route": "mertyas.in.caddy",
+    "site": "mertyas.in",
+    "build_command": ["pnpm", "build"],
+    "sync": {
+      "sources": [
+        {"from": "dist", "to": "web/"}
+      ]
+    },
+    "containers": ["mertyas-in"],
+    "after_up": ["docker exec mertyas-in nginx -s reload"],
+    "checks": [
+      {"url": "https://SITE/healthz", "status": 200},
+      {"url": "https://SITE/", "status": 200}
+    ]
+  }
+}
