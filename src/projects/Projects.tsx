@@ -10,7 +10,7 @@ const projects: Project[] = [
   { name: "mertyas.in", icon: "🌐", desc: "This website — React, Classless.css, Vite", link: "https://github.com/mrtysn/mertyas.in" },
   { name: "aw-cli", icon: "⚡", desc: "Multi-agent Claude Code workflow coordinator", link: "https://github.com/mrtysn/aw-cli" },
   { name: "agents-shared", icon: "🤖", desc: "Shared Claude Code commands and skills via submodule", link: "https://github.com/mrtysn/agents-shared" },
-  { name: "toolbelt", icon: "🧰", desc: "CLI dashboard for custom scripts and apps", link: "https://github.com/mrtysn/toolbelt" },
+  { name: "toolbelt", icon: "🧰", desc: "Mac app and CLI listing my hand-invoked tools" },
   { name: "peek", icon: "👁️", desc: "Screenshot + local LLM analysis wrapper", link: "https://github.com/mrtysn/peek" },
   { name: "teleport", icon: "🚀", desc: "Push local changes to remote WIP branches", link: "https://github.com/mrtysn/teleport" },
   { name: "make-icon", icon: "🎨", desc: "Generate .icns app icons from SF Symbols", link: "https://github.com/mrtysn/make-icon" },
