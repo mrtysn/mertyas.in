@@ -1,4 +1,5 @@
 import Outlink from "../utils/Outlink";
+import RotatingRole from "./RotatingRole";
 import githubIcon from "../assets/icons/github.svg";
 import linkedinIcon from "../assets/icons/linkedin.svg";
 import twitterIcon from "../assets/icons/twitter.svg";
@@ -37,6 +38,7 @@ const AboutWebsite = () => (
 const AboutAuthor = ({ experience }: { experience: number }) => (
   <>
     <h1 className="mb-1 page-title">About</h1>
+    <RotatingRole />
     <p>
       Mert is a <span className="text-primary">Senior Software Engineer</span>{" "}
       with {experience + snapshotExperience}+
