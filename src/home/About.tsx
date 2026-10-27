@@ -41,22 +41,23 @@ const AboutAuthor = ({ experience }: { experience: number }) => (
     <h1 className="mb-1">About</h1>
     <RotatingRole />
     <p>
-      Mert is a <span className="text-primary">Senior Software Engineer</span>{" "}
-      with {experience + snapshotExperience}+
-      years of experience and PhD studies in{" "}
-      <span className="text-primary">data science</span> and{" "}
-      <span className="text-primary">machine learning</span>. He has experience
-      in <span className="text-primary">full-stack</span> development,{" "}
-      <span className="text-primary">game</span> development, team leading, and
-      graduate teaching. He is fluent in Python, TypeScript, C#. He is
-      comfortable with Java, MATLAB. He is a good fit for{" "}
-      <span className="text-primary">autonomous squads</span>, and fast-paced
-      environments that require rapid learning.
+      I’m a <span className="text-primary">Lead Software Engineer</span> with{" "}
+      {experience + snapshotExperience}+ years of experience, and I notice
+      patterns: the same backend shape serves many games, and the same
+      discipline serves many projects. I was the sole backend engineer behind
+      Match Squad and Royal Smash, led the technical team of a startup at the
+      Garanti BBVA Partners accelerator, and did PhD research in machine
+      learning at Wayne State University. I write Python, TypeScript and C#.
     </p>
     <h2>Now</h2>
     <p>
-      Mert builds <span className="text-primary">backends for mobile game studios</span>{" "}
-      and works as a <span className="text-primary">fractional CTO</span>.
+      I build <span className="text-primary">backends for mobile game studios</span>{" "}
+      and work as a <span className="text-primary">fractional CTO</span>, and I do
+      AI engineering and research.
+    </p>
+    <p>
+      Building a game backend or need a fractional CTO?{" "}
+      <Outlink text="Message me on LinkedIn" link="https://linkedin.com/in/mert-yasin/" />.
     </p>
   </>
 );

@@ -4,7 +4,7 @@ import Outlink from "../utils/Outlink";
 interface Work {
   title: string;
   outcome: string;
-  roles: string;
+  where: string;
   detail: ReactNode;
   facts: ReactNode[];
 }
@@ -17,15 +17,15 @@ const figures = [
 
 const work: Work[] = [
   {
-    title: "Mobile game backend",
-    outcome: "Built alone for two games; Royal Smash reached 4.4M+ players",
-    roles: "backend · CTO",
+    title: "Backend",
+    outcome: "Sole backend engineer for two mobile games; Royal Smash reached 4.4M+ players",
+    where: "Cypher Games, 2024–26",
     detail: (
       <>
-        Sole backend engineer for{" "}
+        Built the backends for{" "}
         <Outlink text="Match Squad" link="https://apps.apple.com/us/app/match-squad/id6473704944" /> and{" "}
-        <Outlink text="Royal Smash" link="https://apps.apple.com/us/app/royal-smash-physics-puzzle/id6780891673" />, built
-        from scratch on .NET, SignalR, MongoDB and Redis. One platform keeps each game's data and live traffic apart.
+        <Outlink text="Royal Smash" link="https://apps.apple.com/us/app/royal-smash-physics-puzzle/id6780891673" /> from
+        scratch on .NET, SignalR, MongoDB and Redis. One multi-tenant platform keeps each game’s data and live traffic apart.
       </>
     ),
     facts: [
@@ -35,64 +35,69 @@ const work: Work[] = [
     ],
   },
   {
-    title: "Game frameworks",
-    outcome: "One shape across Godot, Roblox and three.js; 12 games on the first",
-    roles: "backend · CTO",
+    title: "CTO",
+    outcome: "Led the technical team of a startup at the Garanti BBVA Partners accelerator",
+    where: "appliedAI, 2017–18",
     detail:
-      "A solo developer can start a new mobile game without rebuilding the plumbing. Three frameworks share one shape: engine-free services, one game per folder, one command-line tool that checks, tests and builds.",
+      "Coordinated core product development with the team, interns and freelance developers, and kept the full stack running with zero-downtime deployments.",
     facts: [
-      "oj (Godot) carries 12 games; robloj (Roblox) keeps Luau in Git and is built and checked from the command line; threej (three.js) is for very small playables",
-      "A written spec of what an agent reads and drives in any of them: snapshots, actions, a journal and state diffs",
+      "Scaled the B2B data analytics and AI platform to 2,700+ monthly active users",
+      "Curated a database of 3,000+ AI companies through web crawling and organic user acquisition, and built a lead pipeline through proof-of-concept partnerships with vendors",
+      "Migrated the front end from Angular to React; the stack was ReactJS, MobX, Django REST Framework and PostgreSQL on Heroku",
     ],
   },
   {
-    title: "AI agent infrastructure",
-    outcome: "Fact-checking, local decisions, polite fetching and a request limiter",
-    roles: "AI engineer · researcher",
+    title: "AI engineering",
+    outcome: "Agents that check their claims, a local decision model and a local asset pipeline",
+    where: "own work, 2026",
     detail:
-      "Agents make confident mistakes and, left alone, hammer websites. Four tools address that: a fact-check layer, a local decision model, one fetch service and a request limiter.",
+      "Agents make confident mistakes and, left alone, hammer websites. Four tools address that, and a fifth turns generation into a reviewed pipeline.",
     facts: [
-      "The fact-check layer fixes a claim's competing hypotheses before any retrieval, decides numeric relations with the Z3 solver and answers “unknown” when it has no source",
-      "The local decision model answers yes/no, scoring and pick-one-of-N questions with a probability for each option, and nothing leaves the machine",
-      "The fetch service requests each page once under a per-site budget and archives it; the limiter was built after an agent sent about 100 requests to Google in 90 minutes and got two IPs answered with 429",
+      "A fact-check layer fixes a claim’s competing hypotheses before any retrieval, decides numeric relations with the Z3 solver and answers “unknown” when it has no source",
+      "A local decision model answers yes/no, scoring and pick-one-of-N questions with a probability for each option, and nothing leaves the machine",
+      "One fetch service requests each page once under a per-site budget and archives it, and a request limiter keeps every agent within that budget",
+      "A local asset pipeline generates 2D images, 3D meshes, shaders and video for Unity and Godot; only the reviewed folder is ever read by the engines",
     ],
   },
   {
-    title: "Local AI asset pipeline",
-    outcome: "Generated game art, reviewed by hand before any engine imports it",
-    roles: "AI engineer",
+    title: "Research",
+    outcome: "PhD research in machine learning, a winning AI project and a funded grant proposal",
+    where: "2016–",
     detail:
-      "AI-generated game art usually ends in a folder of unreviewed files. This pipeline generates 2D images, 3D meshes, procedural geometry, shaders and video locally for Unity and Godot, and printable solids for a 3D printer.",
+      "PhD ABD in Computer Science at Wayne State University, with the qualifying exam passed in 2020 and research in early seizure detection from EEG and in disease subtyping from genomic data.",
     facts: [
-      "One loop: generate, review, move to the reviewed folder, and only then do the engines import it",
-      "Only the reviewed folder is read by the engines and the slicer; nothing crosses that boundary automatically",
+      <>
+        Ranked 1st at inzva’s <Outlink text="AI Projects #7" link="https://inzva.com/reports/2022/ai-projects-7" /> with a
+        deep-learning project on procedural pattern generation, in 2022
+      </>,
+      <>
+        Authored the successful{" "}
+        <Outlink
+          text="TÜBİTAK 1501"
+          link="https://tubitak.gov.tr/en/funds/industrial/national-support-programs/1501-industrial-rd-projects-grant-programme"
+        />{" "}
+        industrial R&amp;D proposal at VenueX, using computer vision and large language models to process merchant data
+      </>,
+      "Machine learning consultant at ING Bank’s OrangeLab (ATM predictive maintenance, credit-limit and NPS prediction); later taught deep learning and data mining at Wayne State",
     ],
   },
   {
-    title: "One-command project lifecycle",
-    outcome: "Test, build, install, deploy and report on any project the same way",
-    roles: "CTO · backend",
-    detail:
-      "A one-person company runs dozens of projects, and each needs the same discipline. One command reads each repo's manifest and drives the right toolchain, with a shared base for Mac apps.",
-    facts: [
-      "A dashboard shows every ongoing and past project from one generated data file",
-      "Self-hosted app stacks run on one box behind a shared reverse proxy, each as its own Docker Compose stack, with a runbook covering backups and security",
-    ],
-  },
-  {
-    title: "Public tools",
-    outcome: "Link Keeper, cc-statusline and agents-shared, open on GitHub",
-    roles: "AI engineer · CTO",
+    title: "Built for myself",
+    outcome: "Game frameworks, one-command tooling and tools open on GitHub",
+    where: "own work, 2025–26",
     detail: (
       <>
         <Outlink text="Link Keeper" link="https://github.com/mrtysn/link-keeper" /> is a Firefox extension for working through
-        a pile of saved links and capturing what is worth keeping.{" "}
-        <Outlink text="cc-statusline" link="https://github.com/mrtysn/cc-statusline" /> is a single-file Claude Code status
-        line with no dependencies. <Outlink text="agents-shared" link="https://github.com/mrtysn/agents-shared" /> is a set of
-        shared rules, skills and commands for Claude Code.
+        a pile of saved links, <Outlink text="cc-statusline" link="https://github.com/mrtysn/cc-statusline" /> is a
+        single-file Claude Code status line, and <Outlink text="agents-shared" link="https://github.com/mrtysn/agents-shared" />{" "}
+        is a set of shared rules, skills and commands for Claude Code. The rest is private and described here.
       </>
     ),
-    facts: [],
+    facts: [
+      "One game-framework shape across Godot, Roblox and three.js: engine-free services, one game per folder, one command-line tool that checks, tests and builds; the Godot one carries 12 games",
+      "One command to test, build, install, deploy and report on any project, plus a dashboard of every ongoing and past project",
+      "Self-hosted app stacks on one box behind a shared reverse proxy, each its own Docker Compose stack, with a runbook covering backups and security",
+    ],
   },
 ];
 
@@ -104,7 +109,7 @@ function Projects() {
   return (
     <div>
       <h1>Projects</h1>
-      <p>Backend, CTO, AI engineering and research work. Private repositories are described, not linked.</p>
+      <p>One row per role, with the work that backs it. Private repositories are described, not linked.</p>
       <ul className="figures">
         {figures.map((f) => (
           <li key={f.value}>
@@ -119,19 +124,21 @@ function Projects() {
             <summary>
               <span className="work-title">{w.title}</span>
               <span className="work-outcome">{w.outcome}</span>
-              <span className="work-roles">{w.roles}</span>
+              <span className="work-where">{w.where}</span>
             </summary>
             <p>{w.detail}</p>
-            {w.facts.length > 0 && (
-              <ul>
-                {w.facts.map((f, j) => (
-                  <li key={j}>{f}</li>
-                ))}
-              </ul>
-            )}
+            <ul>
+              {w.facts.map((f, j) => (
+                <li key={j}>{f}</li>
+              ))}
+            </ul>
           </details>
         ))}
       </div>
+      <p>
+        Building a game backend or need a fractional CTO?{" "}
+        <Outlink text="Message me on LinkedIn" link="https://linkedin.com/in/mert-yasin/" />.
+      </p>
     </div>
   );
 }
