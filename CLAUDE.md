@@ -19,22 +19,10 @@ Personal website at [mertyas.in](https://mertyas.in) built with React 19, TypeSc
 ```bash
 pnpm install          # Install dependencies
 pnpm run dev          # Start dev server
-pnpm run build        # Build for production (includes bookmark generation)
+pnpm run build        # Build for production
 pnpm run lint         # Run ESLint
 pnpm run preview      # Preview production build
 pnpm run validate     # Run validation script
-pnpm run import:bookmarks --input <file>  # Import bookmarks (merge-based)
-pnpm run bookmarks:check                  # Check bookmark links (standalone, not in build)
-pnpm run bookmarks:previews               # Fetch OG preview images
-pnpm run bookmarks:favicons               # Copy favicons from the local Firefox profile (re-run after imports)
-pnpm run bookmarks:organize               # LLM-assisted organization (requires ANTHROPIC_API_KEY)
-pnpm run bookmarks:apply                  # Review/apply LLM suggestions
-pnpm run bookmarks:wayback                # Check Wayback Machine for dead links
-pnpm run bookmarks:export --output <file> # Export to Firefox JSON format
-pnpm run bookmarks:diff --firefox <file>  # Diff local vs Firefox export
-pnpm run bookmarks:migrate                # Migrate data to current format
-pnpm run bookmarks:admin                  # Launch bookmark admin UI (dev only, port 5175)
-pnpm run bookmarks:curate                 # Interactive Claude Code session for bookmark curation
 ```
 
 ## Project Structure
@@ -43,18 +31,12 @@ pnpm run bookmarks:curate                 # Interactive Claude Code session for 
 ├── src/
 │   ├── App.tsx           # Main app component
 │   ├── main.tsx          # Entry point
-│   ├── routes.tsx        # Route definitions (includes the /bookmarks/*? wildcard)
+│   ├── routes.tsx        # Route definitions
 │   ├── home/             # Home page
 │   ├── projects/         # Projects section
-│   ├── bookmarks/        # Bookmarks UI (Bookmarks, BookmarksList, TagCloud, BookmarksStats, etc.)
 │   ├── styles/           # CSS styles
-│   └── utils/            # Utility functions (types.ts has v2 data model)
-├── scripts/
-│   └── bookmarks/              # Bookmark processing scripts (build, merge, parse, organize, export)
-│       └── admin/              # Bookmark admin UI server (Express + single HTML file)
-├── extension/          # Firefox WebExtension for bookmark sync
-├── dist/               # Build output (gitignored)
-└── docs/               # Documentation
+│   └── utils/            # Utility functions
+└── dist/               # Build output (gitignored)
 ```
 
 ## Build Pipeline
@@ -62,7 +44,6 @@ pnpm run bookmarks:curate                 # Interactive Claude Code session for 
 The `build` command runs sequentially:
 1. `tsc -b` - TypeScript compilation
 2. `vite build` - Vite production build
-3. `tsx scripts/bookmarks/build-bookmarks.ts` - Build bookmarks data
 
 ## Code Style
 
@@ -82,17 +63,3 @@ These rules protect the hand-crafted aesthetic of this site. Follow them when mo
 6. **No generic placeholders.** Every project gets a distinct icon and a one-line description. If it can't be described in one line, reconsider whether it belongs on the page.
 7. **Archived items are present but quiet.** Reduced opacity, no accent, no link styling. They exist for completeness, not prominence.
 8. **No LLM bloat.** Do not add wrapper divs, utility classes, or abstractions that exist only for "flexibility." If a pattern is used once, inline it.
-
-## Bookmarks System
-
-Full-featured bookmark management system. Data format is v1.1.0 with merge-based import.
-
-**Implemented features:**
-1. **Foundation** — GUID tracking, merge-based import (`--force-replace` for destructive), v2 migration
-2. **Link Health** — Status codes persisted to bookmarks.json, Wayback Machine fallback for dead links, archive URL storage
-3. **LLM Organization** — Claude API batch processing, suggestions cache, interactive/auto-apply modes
-4. **Enhanced UI** — URL-based folder navigation (`/bookmarks/Dev/React`), sort (date/alpha/recently-checked), tag cloud, stats dashboard, expandable detail view, status filter (all/live/dead/archived/unchecked)
-5. **Two-Way Sync** — Firefox JSON export, diff tool, Firefox WebExtension (`extension/`)
-6. **Admin UI** — Browser-based admin at `localhost:5175` for visual curation, LLM organize, health checks, sync, and direct editing. Dev-only, not part of production build. See `docs/bookmarks-admin.md`.
-
-See `docs/bookmarks-plan.md` for the original design document.

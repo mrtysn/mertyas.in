@@ -13,9 +13,6 @@ function Header() {
         <li>
           <Link href="/projects">Projects</Link>
         </li>
-        <li>
-          <Link href="/bookmarks">Bookmarks</Link>
-        </li>
         {/* Last in the markup because it sits last on screen: the tab order is
             the DOM order, and from the right-hand end it used to run backwards. */}
         <li className="float-right sticky no-select">

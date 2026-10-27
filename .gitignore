@@ -29,8 +29,6 @@ repomix-output.txt
 # claude - share skills/rules/commands, but not personal settings
 .claude/settings.local.json
 
-# bookmarks build cache
-src/bookmarks/data/.cache/
 
 # machine-local: skills this repo opts out of (see .agents/scripts/init.sh)
 .agents-ignore
