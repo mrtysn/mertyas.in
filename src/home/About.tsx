@@ -54,9 +54,8 @@ const AboutAuthor = ({ experience }: { experience: number }) => (
     </p>
     <h2>Now</h2>
     <p>
-      Mert is currently working as{" "}
-      <span className="text-primary">Lead Backend Engineer</span> at{" "}
-      <Outlink text="Cypher Games" link="https://www.cyphergames.com/" />.
+      Mert builds <span className="text-primary">backends for mobile game studios</span>{" "}
+      and works as a <span className="text-primary">fractional CTO</span>.
     </p>
   </>
 );
