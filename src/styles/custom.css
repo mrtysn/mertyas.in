@@ -129,7 +129,7 @@ article code {
 
 .figures span {
   max-width: 12rem;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: var(--cdark);
 }
 
@@ -163,13 +163,13 @@ article code {
 }
 
 .work summary::after {
-  content: "+";
+  content: "+" / "";
   text-align: end;
   color: var(--cdark);
 }
 
 .work details[open] summary::after {
-  content: "\2212";
+  content: "\2212" / "";
 }
 
 .work summary:hover,
@@ -187,8 +187,18 @@ article code {
   font-weight: 700;
 }
 
+.work-outcome {
+  text-wrap: pretty;
+}
+
+/* A reading line stays under about 70 characters. */
+.work details > p,
+.work details > ul {
+  max-width: 65ch;
+}
+
 .work-roles {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: var(--cdark);
   white-space: nowrap;
 }
@@ -206,4 +216,16 @@ article code {
     grid-column: 2;
     grid-row: 1;
   }
+}
+
+/* Text for screen readers only. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

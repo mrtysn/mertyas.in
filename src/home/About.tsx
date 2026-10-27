@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import Outlink from "../utils/Outlink";
 import RotatingRole from "./RotatingRole";
 import githubIcon from "../assets/icons/github.svg";
@@ -132,6 +133,10 @@ const AuthorLinks = () => (
 
 function About() {
   const experience = calculateExperience();
+
+  useEffect(() => {
+    document.title = "About — Mert Yaşin";
+  }, []);
 
   return (
     <div>

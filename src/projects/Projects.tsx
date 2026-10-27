@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import Outlink from "../utils/Outlink";
 
 interface Work {
@@ -97,6 +97,10 @@ const work: Work[] = [
 ];
 
 function Projects() {
+  useEffect(() => {
+    document.title = "Projects — Mert Yaşin";
+  }, []);
+
   return (
     <div>
       <h1>Projects</h1>
