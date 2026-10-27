@@ -63,7 +63,7 @@ const work: Work[] = [
   {
     title: "Research",
     outcome: "PhD research in machine learning, a winning AI project and a funded grant proposal",
-    where: "2016–",
+    where: "academic and applied",
     detail:
       "PhD ABD in Computer Science at Wayne State University, with the qualifying exam passed in 2020 and research in early seizure detection from EEG and in disease subtyping from genomic data.",
     facts: [
