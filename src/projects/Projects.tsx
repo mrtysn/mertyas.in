@@ -99,7 +99,7 @@ const work: Work[] = [
 function Projects() {
   return (
     <div>
-      <h1 className="page-title">Projects</h1>
+      <h1>Projects</h1>
       <p>Backend, CTO, AI engineering and research work. Private repositories are described, not linked.</p>
       <ul className="figures">
         {figures.map((f) => (

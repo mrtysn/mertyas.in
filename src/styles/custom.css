@@ -26,15 +26,6 @@ html[data-theme="light"] .colorHeart {
   min-height: 20rem;
 }
 
-/* Every page names itself with an h1, one level per step below it. The levels
-   changed, the look did not: this keeps the size and weight the
-   heading had before, so the outline is what moved, not the page. */
-.page-title {
-  font-size: 2em;
-  font-weight: 300;
-  font-variant: small-caps;
-}
-
 /* The keyboard's way past the nav: out of sight until it takes focus, and a
    real control once it has. */
 .skip-link {
