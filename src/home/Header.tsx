@@ -11,9 +11,6 @@ function Header() {
           <Link href="/">About</Link>
         </li>
         <li>
-          <Link href="/posts">Posts</Link>
-        </li>
-        <li>
           <Link href="/projects">Projects</Link>
         </li>
         <li>

@@ -13,14 +13,13 @@ Personal website at [mertyas.in](https://mertyas.in) built with React 19, TypeSc
 - **Build Tool**: Vite
 - **Package Manager**: pnpm (required)
 - **Routing**: wouter
-- **Markdown**: markdown-it with highlight.js
 
 ## Commands
 
 ```bash
 pnpm install          # Install dependencies
 pnpm run dev          # Start dev server
-pnpm run build        # Build for production (includes feed & bookmark generation)
+pnpm run build        # Build for production (includes bookmark generation)
 pnpm run lint         # Run ESLint
 pnpm run preview      # Preview production build
 pnpm run validate     # Run validation script
@@ -45,15 +44,12 @@ pnpm run bookmarks:curate                 # Interactive Claude Code session for 
 │   ├── App.tsx           # Main app component
 │   ├── main.tsx          # Entry point
 │   ├── routes.tsx        # Route definitions (includes the /bookmarks/*? wildcard)
-│   ├── components/       # Reusable components
 │   ├── home/             # Home page
-│   ├── posts/            # Blog posts
 │   ├── projects/         # Projects section
 │   ├── bookmarks/        # Bookmarks UI (Bookmarks, BookmarksList, TagCloud, BookmarksStats, etc.)
 │   ├── styles/           # CSS styles
 │   └── utils/            # Utility functions (types.ts has v2 data model)
 ├── scripts/
-│   ├── generate-feeds.ts       # RSS/Atom feed generation
 │   └── bookmarks/              # Bookmark processing scripts (build, merge, parse, organize, export)
 │       └── admin/              # Bookmark admin UI server (Express + single HTML file)
 ├── extension/          # Firefox WebExtension for bookmark sync
@@ -66,8 +62,7 @@ pnpm run bookmarks:curate                 # Interactive Claude Code session for 
 The `build` command runs sequentially:
 1. `tsc -b` - TypeScript compilation
 2. `vite build` - Vite production build
-3. `tsx scripts/generate-feeds.ts` - Generate RSS/Atom feeds
-4. `tsx scripts/bookmarks/build-bookmarks.ts` - Build bookmarks data
+3. `tsx scripts/bookmarks/build-bookmarks.ts` - Build bookmarks data
 
 ## Code Style
 

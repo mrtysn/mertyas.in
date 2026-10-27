@@ -1,8 +1,4 @@
 import { ComponentType } from "react";
-import Posts from "./components/Posts";
-import Post from "./components/Post";
-import Tags from "./components/Tags";
-import Tag from "./components/Tag";
 import About from "./home/About";
 import Projects from "./projects/Projects";
 import Bookmarks from "./bookmarks/Bookmarks";
@@ -19,9 +15,7 @@ export const routes: RouteProps[] = [
     component: About,
   },
   {
-    // The nav labels this "About", so /about is a URL people type. Without it
-    // the request falls through to the "/:slug" catch-all and reports a
-    // missing post.
+    // The nav labels this "About", so /about is a URL people type.
     path: "/about",
     component: About,
   },
@@ -36,21 +30,5 @@ export const routes: RouteProps[] = [
     // reads it as a single segment under a key literally named "rest*".
     path: "/bookmarks/*?",
     component: Bookmarks,
-  },
-  {
-    path: "/posts",
-    component: Posts,
-  },
-  {
-    path: "/tags",
-    component: Tags,
-  },
-  {
-    path: "/tags/:tag",
-    component: Tag,
-  },
-  {
-    path: "/:slug",
-    component: Post,
   },
 ];
