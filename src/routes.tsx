@@ -6,7 +6,6 @@ import Tag from "./components/Tag";
 import About from "./home/About";
 import Projects from "./projects/Projects";
 import Bookmarks from "./bookmarks/Bookmarks";
-import Jams from "./jams/Jams";
 import { RouteComponentProps } from "wouter";
 
 export type RouteProps = {
@@ -37,10 +36,6 @@ export const routes: RouteProps[] = [
     // reads it as a single segment under a key literally named "rest*".
     path: "/bookmarks/*?",
     component: Bookmarks,
-  },
-  {
-    path: "/jams",
-    component: Jams,
   },
   {
     path: "/posts",

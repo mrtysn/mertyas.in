@@ -17,7 +17,7 @@ function App() {
       <main id="content" className="content">
         {/*
           Switch renders only the first match. Without it every <Route> matches
-          independently, so /jams, /projects and /posts each rendered their own
+          independently, so /projects and /posts each rendered their own
           page *and* the "/:slug" catch-all underneath it, which showed "Post
           not found" at the bottom. Order in `routes` matters: the catch-all is
           last.
