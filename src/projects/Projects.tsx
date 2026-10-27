@@ -25,7 +25,8 @@ const work: Work[] = [
         Built the backends for{" "}
         <Outlink text="Match Squad" link="https://apps.apple.com/us/app/match-squad/id6473704944" /> and{" "}
         <Outlink text="Royal Smash" link="https://apps.apple.com/us/app/royal-smash-physics-puzzle/id6780891673" /> from
-        scratch on .NET, SignalR, MongoDB and Redis. One multi-tenant platform keeps each game’s data and live traffic apart.
+        scratch on .NET, SignalR, MongoDB and Redis. One multi-tenant platform keeps each game’s data and live traffic apart.{" "}
+        <Outlink text="See how it fits together" link="/backend-architecture.html" />.
       </>
     ),
     facts: [
