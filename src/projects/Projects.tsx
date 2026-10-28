@@ -137,7 +137,7 @@ function Projects() {
         ))}
       </div>
       <p>
-        Building a game backend or need a fractional CTO?{" "}
+        Building a game backend?{" "}
         <Outlink text="Message me on LinkedIn" link="https://linkedin.com/in/mert-yasin/" />.
       </p>
     </div>

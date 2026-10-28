@@ -49,12 +49,11 @@ const AboutAuthor = ({ experience }: { experience: number }) => (
     </p>
     <h2>Now</h2>
     <p>
-      I build <span className="text-primary">backends for mobile game studios</span>{" "}
-      and work as a <span className="text-primary">fractional CTO</span>, and I do
+      I build <span className="text-primary">backends for mobile game studios</span>, and I do
       AI engineering and research.
     </p>
     <p>
-      Building a game backend or need a fractional CTO?{" "}
+      Building a game backend?{" "}
       <Outlink text="Message me on LinkedIn" link="https://linkedin.com/in/mert-yasin/" />.
     </p>
   </>
